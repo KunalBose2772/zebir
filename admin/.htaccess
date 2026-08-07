@@ -1,0 +1,24 @@
+# ZEBIR LIBAS - Admin Console Production Security
+
+# 1. Prevent Directory Listings
+Options -Indexes
+
+# 2. Block direct HTTP access to includes/ directory
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^includes/.*$ - [F,L]
+
+    # Extensionless PHP URLs (e.g. /admin/orders to orders.php)
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME}.php -f
+    RewriteRule ^([^/]+)/?$ $1.php [L,QSA]
+</IfModule>
+
+# 3. HTTP Security Headers specifically for Admin Panel
+<IfModule mod_headers.c>
+    Header set X-Frame-Options "DENY"
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "same-origin"
+</IfModule>

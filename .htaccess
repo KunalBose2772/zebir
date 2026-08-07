@@ -1,0 +1,51 @@
+# ZEBIR LIBAS - Production Server Configuration
+
+# 1. Prevent Directory Listings
+Options -Indexes
+
+# 2. Block direct access to sensitive file types and patterns
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+<FilesMatch "\.(sql|bak|log|ini|sh|conf|env|yml|yaml)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+<Files "composer.json">
+    Order allow,deny
+    Deny from all
+</Files>
+<Files "composer.lock">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# 3. HTTP Security Headers
+<IfModule mod_headers.c>
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# 4. Clean Routing Rules
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Optional: Force HTTPS (uncomment when SSL is installed on production)
+    # RewriteCond %{HTTPS} off
+    # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # 1. Product Detail Page Clean URL Rewrite
+    RewriteRule ^product/([^/]+)/?$ product.php?slug=$1 [L,QSA]
+
+    # 2. Category Archive Page Clean URL Rewrite
+    RewriteRule ^category/([^/]+)/?$ shop.php?category=$1 [L,QSA]
+
+    # 3. Extensionless PHP URLs (e.g. /about to about.php, /cart to cart.php)
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME}.php -f
+    RewriteRule ^([^/]+)/?$ $1.php [L,QSA]
+</IfModule>

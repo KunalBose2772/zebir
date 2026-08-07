@@ -1,0 +1,40 @@
+# Dependency directories
+/vendor/
+
+# Sensitive config files
+config/database.php
+
+# Environment & secrets
+.env
+*.env
+
+# XAMPP-specific
+error_log
+php_errorlog
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+
+# Upload directories (don't push user-uploaded content)
+uploads/products/*
+uploads/banners/*
+uploads/logo/*
+uploads/payments/*
+uploads/qr/*
+
+# Keep upload dirs but not their contents
+!uploads/products/.gitkeep
+!uploads/banners/.gitkeep
+!uploads/logo/.gitkeep
+!uploads/payments/.gitkeep
+!uploads/qr/.gitkeep
+
+# Temp/utility scripts
+convert_images.php
+optimize_db_categories.php
+db_audit.php
