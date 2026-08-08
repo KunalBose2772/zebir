@@ -46,11 +46,12 @@ $otherCats = array_slice($allActiveCategories, $half);
 <?php
 $isIndex = (basename($_SERVER['PHP_SELF']) === 'index.php');
 $heroMode = getSetting('home_hero_mode', 'content');
-$isTransparentHeader = $isIndex && ($heroMode !== 'image');
+$isTransparentHeader = $isIndex;
+$heroModeClass = ($isIndex && $heroMode === 'image') ? 'hero-image-only' : '';
 ?>
 
 <!-- Header / Navbar -->
-<header class="site-header <?= $isTransparentHeader ? 'header-transparent' : 'header-solid' ?>" id="siteHeader">
+<header class="site-header <?= $isTransparentHeader ? 'header-transparent' : 'header-solid' ?> <?= $heroModeClass ?>" id="siteHeader">
   <!-- Announcement Bar -->
   <div class="announcement-bar" id="announcementBar" <?= $isTransparentHeader ? 'style="display: none;"' : '' ?>>
     <div class="announcement-marquee-wrapper">

@@ -252,13 +252,13 @@ input:focus, select:focus, textarea:focus {
 /* Solid Header State */
 .site-header.header-solid {
   position: relative;
-  background: var(--bg-surface);
+  background: var(--bg-dark);
   box-shadow: var(--shadow-sm);
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 .site-header.header-solid .nav-link,
 .site-header.header-solid .icon-btn {
-  color: var(--text-main);
+  color: #f7f3eb;
 }
 .site-header.header-solid .nav-link:hover {
   color: var(--accent-gold);
@@ -270,14 +270,14 @@ input:focus, select:focus, textarea:focus {
   top: 0;
   left: 0;
   right: 0;
-  background: var(--bg-surface);
+  background: var(--bg-dark);
   box-shadow: var(--shadow-md);
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   animation: slideDownHeader 0.3s ease forwards;
 }
 .site-header.header-sticky .nav-link,
 .site-header.header-sticky .icon-btn {
-  color: var(--text-main);
+  color: #f7f3eb;
 }
 .site-header.header-sticky .nav-link:hover {
   color: var(--accent-gold);
@@ -3532,4 +3532,13 @@ input[type="radio"]:checked + .color-pill {
   display: none !important;
   width: 0 !important;
   height: 0 !important;
+}
+
+/* Image-only hero mode header mobile override */
+@media (max-width: 991.98px) {
+  .site-header.header-transparent.hero-image-only {
+    position: relative;
+    background: var(--bg-dark);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
 }
