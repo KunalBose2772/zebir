@@ -31,7 +31,8 @@ $products = $stmt->fetchAll();
 
 <div class="admin-page-header">
   <h2>Product Catalogue</h2>
-  <div class="admin-page-actions">
+  <div class="admin-page-actions" style="display: flex; gap: 10px;">
+    <a href="export" class="btn-admin btn-admin-primary btn-admin-sm">Export Catalogue (CSV)</a>
     <a href="product-add" class="btn-admin btn-admin-gold btn-admin-sm">+ Add New Product</a>
   </div>
 </div>

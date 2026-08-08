@@ -511,6 +511,32 @@ input:focus, select:focus, textarea:focus {
   object-position: center;
 }
 
+/* Image-Only Hero Aspect Ratio Slider (Desktop & Mobile) */
+.hero-slider.hero-image-only {
+  min-height: auto !important;
+  height: auto !important;
+}
+
+.hero-slider.hero-image-only .swiper-slide {
+  min-height: auto !important;
+  height: auto !important;
+  display: block !important;
+}
+
+.hero-slider.hero-image-only .swiper-slide picture,
+.hero-slider.hero-image-only .swiper-slide img {
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  height: auto !important;
+  display: block !important;
+  object-fit: contain !important;
+}
+
+.hero-slider.hero-image-only .hero-overlay {
+  display: none !important;
+}
+
 .hero-overlay {
   position: absolute;
   inset: 0;

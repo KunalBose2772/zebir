@@ -63,7 +63,7 @@ if (empty($heroSlides)) {
 ?>
 
 <!-- Full-viewport Hero Slider -->
-<section class="hero-slider swiper position-relative" aria-label="Featured collections">
+<section class="hero-slider swiper position-relative <?= $heroMode === 'image' ? 'hero-image-only' : '' ?>" aria-label="Featured collections">
   <div class="swiper-wrapper">
     <?php foreach ($heroSlides as $slide):
       $slideImage = $slide['image'] ? bannerImageUrl($slide['image']) : assetUrl('images/banner-placeholder.jpg');
@@ -494,6 +494,7 @@ if (!function_exists('getInstaShortcode')) {
   document.addEventListener("DOMContentLoaded", function() {
     new Swiper(".hero-slider", {
       loop: true,
+      autoHeight: true,
       autoplay: { delay: 6000, disableOnInteraction: false },
       pagination: { el: ".swiper-pagination", clickable: true },
       navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
