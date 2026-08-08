@@ -35,6 +35,7 @@ uploads/qr/*
 !uploads/qr/.gitkeep
 
 # Temp/utility scripts
-convert_images.php
+# convert_images.php
+# cleanup_images.php
 optimize_db_categories.php
 db_audit.php
