@@ -36,7 +36,7 @@ $orders = $stmt->fetchAll();
 
 <!-- Filters Bar -->
 <div class="admin-search-bar" style="max-width: 580px;">
-  <form action="orders.php" method="GET">
+  <form action="orders" method="GET">
     <select name="status" class="form-control" onchange="this.form.submit()" style="width: 130px; height: 32px !important; padding: 4px 8px !important; font-size: 0.75rem !important;">
       <option value="">-- All Status --</option>
       <option value="pending" <?= $status === 'pending' ? 'selected' : '' ?>>Pending</option>
@@ -92,7 +92,7 @@ $orders = $stmt->fetchAll();
             </td>
             <td style="font-size: 0.8rem; color: var(--text-muted);"><?= date('d M Y', strtotime($o['created_at'])) ?></td>
             <td>
-              <a href="order-detail.php?id=<?= $o['id'] ?>" class="btn-admin btn-admin-primary btn-admin-sm" title="View Details">
+              <a href="order-detail?id=<?= $o['id'] ?>" class="btn-admin btn-admin-primary btn-admin-sm" title="View Details">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
               </a>
             </td>

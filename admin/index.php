@@ -78,7 +78,7 @@ $latestOrders = $pdo->query("SELECT * FROM orders ORDER BY id DESC LIMIT 8")->fe
 <div class="admin-card">
   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
     <h3 style="margin:0; font-size:1.2rem; font-weight: 700;">Latest Orders</h3>
-    <a href="orders.php" class="btn-admin btn-admin-primary btn-admin-sm">View All Orders &rarr;</a>
+    <a href="orders" class="btn-admin btn-admin-primary btn-admin-sm">View All Orders &rarr;</a>
   </div>
 
   <div class="admin-table-wrap">
@@ -119,7 +119,7 @@ $latestOrders = $pdo->query("SELECT * FROM orders ORDER BY id DESC LIMIT 8")->fe
               </td>
               <td style="font-size: 0.8rem; color: var(--text-muted);"><?= date('d M Y, h:i A', strtotime($o['created_at'])) ?></td>
               <td>
-                <a href="order-detail.php?id=<?= $o['id'] ?>" class="btn-admin btn-admin-primary btn-admin-sm" title="View Details">
+                <a href="order-detail?id=<?= $o['id'] ?>" class="btn-admin btn-admin-primary btn-admin-sm" title="View Details">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                 </a>
               </td>

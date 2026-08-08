@@ -11,7 +11,7 @@ if (isset($_GET['delete'])) {
     $id = (int)$_GET['delete'];
     $pdo->prepare("DELETE FROM categories WHERE id = ?")->execute([$id]);
     setFlash('success', 'Category deleted successfully.');
-    redirectTo('admin/categories.php');
+    redirectTo('admin/categories');
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("INSERT INTO categories (name, slug, description, image) VALUES (?, ?, ?, ?)");
         $stmt->execute([$name, $slug, $desc, $img]);
         setFlash('success', 'Category created successfully.');
-        redirectTo('admin/categories.php');
+        redirectTo('admin/categories');
     }
 }
 
@@ -45,7 +45,7 @@ $categories = $pdo->query("SELECT c.*, COUNT(p.id) as product_count FROM categor
   <!-- Add Category Form -->
   <div class="admin-card">
     <h3 style="margin-top:0; font-size:1.15rem; font-weight:700; margin-bottom: 20px;">Add New Category</h3>
-    <form action="categories.php" method="POST" enctype="multipart/form-data">
+    <form action="categories" method="POST" enctype="multipart/form-data">
       <?= csrfField() ?>
       
       <div class="form-group">
@@ -91,7 +91,7 @@ $categories = $pdo->query("SELECT c.*, COUNT(p.id) as product_count FROM categor
               <td><code><?= e($cat['slug']) ?></code></td>
               <td><span style="font-weight:700; background-color: var(--border-light); padding: 2px 8px; border-radius: 4px;"><?= $cat['product_count'] ?></span></td>
               <td>
-                <a href="categories.php?delete=<?= $cat['id'] ?>&csrf_token=<?= csrfToken() ?>" onclick="return confirm('Delete category?')" class="btn-admin btn-admin-danger btn-admin-sm" style="padding:6px;" title="Delete">
+                <a href="categories?delete=<?= $cat['id'] ?>&csrf_token=<?= csrfToken() ?>" onclick="return confirm('Delete category?')" class="btn-admin btn-admin-danger btn-admin-sm" style="padding:6px;" title="Delete">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                 </a>
               </td>

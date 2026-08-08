@@ -184,7 +184,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
     Upload your standard WooCommerce exported products CSV catalog file. The importer engine will automatically map matching categories, download media files, process stock levels, and set product attributes.
   </p>
 
-  <form action="import.php" method="POST" enctype="multipart/form-data">
+  <form action="import" method="POST" enctype="multipart/form-data">
     <?= csrfField() ?>
     
     <div class="form-group">

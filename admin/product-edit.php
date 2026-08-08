@@ -11,7 +11,7 @@ $stmt = $pdo->prepare("SELECT * FROM products WHERE id = ?");
 $stmt->execute([$id]);
 $product = $stmt->fetch();
 
-if (!$product) redirectTo('admin/products.php');
+if (!$product) redirectTo('admin/products');
 
 $categories = $pdo->query("SELECT * FROM categories ORDER BY name ASC")->fetchAll();
 $errors = [];
@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
 
         setFlash('success', 'Product updated successfully.');
-        redirectTo('admin/products.php');
+        redirectTo('admin/products');
     } else {
         $errors[] = 'Name and price are required.';
     }
@@ -61,11 +61,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="admin-page-header">
   <h2>Edit Product #<?= $product['id'] ?></h2>
   <div class="admin-page-actions">
-    <a href="products.php" class="btn-admin btn-admin-sm">&larr; Back to Catalogue</a>
+    <a href="products" class="btn-admin btn-admin-sm">&larr; Back to Catalogue</a>
   </div>
 </div>
 
-<form action="product-edit.php?id=<?= $product['id'] ?>" method="POST" enctype="multipart/form-data">
+<form action="product-edit?id=<?= $product['id'] ?>" method="POST" enctype="multipart/form-data">
   <?= csrfField() ?>
   
   <div class="admin-grid-2-1">

@@ -12,7 +12,7 @@ $stmt = $pdo->prepare("SELECT * FROM orders WHERE id = ?");
 $stmt->execute([$id]);
 $order = $stmt->fetch();
 
-if (!$order) redirectTo('admin/orders.php');
+if (!$order) redirectTo('admin/orders');
 
 $itemStmt = $pdo->prepare("SELECT * FROM order_items WHERE order_id = ?");
 $itemStmt->execute([$id]);
@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             sendOrderStatusEmail(array_merge($order, ['status' => $newStatus]), $newStatus);
 
             setFlash('success', 'Order status updated to ' . strtoupper(str_replace('_', ' ', $newStatus)) . ' and customer notified.');
-            redirectTo("admin/order-detail.php?id=$id");
+            redirectTo("admin/order-detail?id=$id");
         }
     }
 
@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         sendShippingEmail($updatedOrder);
 
         setFlash('success', 'Shipping details updated and notification email sent.');
-        redirectTo("admin/order-detail.php?id=$id");
+        redirectTo("admin/order-detail?id=$id");
     }
 }
 ?>
@@ -76,8 +76,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <span style="font-size:0.8rem; color: var(--text-muted);">Placed on <?= date('d M Y, h:i A', strtotime($order['created_at'])) ?></span>
   </div>
   <div class="admin-page-actions">
-    <a href="../invoice.php?id=<?= urlencode($order['order_number']) ?>" target="_blank" class="btn-admin btn-admin-gold btn-admin-sm">View / Print Invoice</a>
-    <a href="shipping-bill.php?id=<?= $order['id'] ?>" target="_blank" class="btn-admin btn-admin-primary btn-admin-sm">Print Shipping Bill</a>
+    <a href="../invoice?id=<?= urlencode($order['order_number']) ?>" target="_blank" class="btn-admin btn-admin-gold btn-admin-sm">View / Print Invoice</a>
+    <a href="shipping-bill?id=<?= $order['id'] ?>" target="_blank" class="btn-admin btn-admin-primary btn-admin-sm">Print Shipping Bill</a>
   </div>
 </div>
 
@@ -175,7 +175,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="admin-card">
       <h3 style="margin-top:0; font-size:1.15rem; font-weight:700; margin-bottom: 20px;">Order & Payment Status</h3>
       
-      <form action="order-detail.php?id=<?= $id ?>" method="POST">
+      <form action="order-detail?id=<?= $id ?>" method="POST">
         <?= csrfField() ?>
         
         <div class="form-group">
@@ -219,7 +219,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="admin-card">
       <h3 style="margin-top:0; font-size:1.15rem; font-weight:700; margin-bottom: 20px;">Manual Courier & Tracking</h3>
       
-      <form action="order-detail.php?id=<?= $id ?>" method="POST">
+      <form action="order-detail?id=<?= $id ?>" method="POST">
         <?= csrfField() ?>
         
         <div class="form-group">

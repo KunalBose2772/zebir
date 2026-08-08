@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute(['home_hero_config', json_encode(array_values($slides), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)]);
 
     setFlash('success', 'Homepage settings saved successfully.');
-    redirectTo('admin/homepage.php');
+    redirectTo('admin/homepage');
 }
 
 if (empty($selectedCategoryIds)) {
@@ -89,9 +89,9 @@ if (empty($selectedCategoryIds)) {
 
 if (empty($heroConfig)) {
     $heroConfig = [
-        ['image' => 'HERO_03_WEDDING_COLLECTION_DESKTOP.png', 'title' => 'Bridal Collection', 'description' => 'Discover couture-inspired suits designed for unforgettable celebrations and graceful presence.', 'button_text' => 'Shop Now', 'button_link' => 'shop.php', 'link' => ''],
-        ['image' => 'HERO_01_LUXURY_COLLECTION_DESKTOP.png', 'title' => 'Signature Couture', 'description' => 'Modern luxury crafted in every detail.', 'button_text' => 'Shop Now', 'button_link' => 'shop.php', 'link' => ''],
-        ['image' => 'HERO_02_FESTIVE_COLLECTION_DESKTO.png', 'title' => 'Festive Edit', 'description' => 'Find richly textured suits and festive pieces made to shine through every occasion.', 'button_text' => 'Shop Now', 'button_link' => 'shop.php', 'link' => ''],
+        ['image' => 'HERO_03_WEDDING_COLLECTION_DESKTOP.png', 'title' => 'Bridal Collection', 'description' => 'Discover couture-inspired suits designed for unforgettable celebrations and graceful presence.', 'button_text' => 'Shop Now', 'button_link' => 'shop', 'link' => ''],
+        ['image' => 'HERO_01_LUXURY_COLLECTION_DESKTOP.png', 'title' => 'Signature Couture', 'description' => 'Modern luxury crafted in every detail.', 'button_text' => 'Shop Now', 'button_link' => 'shop', 'link' => ''],
+        ['image' => 'HERO_02_FESTIVE_COLLECTION_DESKTO.png', 'title' => 'Festive Edit', 'description' => 'Find richly textured suits and festive pieces made to shine through every occasion.', 'button_text' => 'Shop Now', 'button_link' => 'shop', 'link' => ''],
     ];
 }
 ?>
@@ -100,7 +100,7 @@ if (empty($heroConfig)) {
   <h2>Homepage Configuration</h2>
 </div>
 
-<form action="homepage.php" method="POST" enctype="multipart/form-data">
+<form action="homepage" method="POST" enctype="multipart/form-data">
   <?= csrfField() ?>
 
   <div style="display:flex; flex-direction:column; gap:24px;">

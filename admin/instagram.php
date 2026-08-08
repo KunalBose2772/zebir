@@ -25,7 +25,7 @@ if (isset($_GET['delete'])) {
         $delStmt->execute([$id]);
         setFlash('success', 'Instagram reel deleted successfully.');
     }
-    redirectTo('admin/instagram.php');
+    redirectTo('admin/instagram');
 }
 
 // Handle Add/Edit Form submission
@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute([$imageName, $url, $sortOrder, $isActive]);
         
         setFlash('success', 'New Instagram reel added successfully.');
-        redirectTo('admin/instagram.php');
+        redirectTo('admin/instagram');
     }
 }
 
@@ -118,7 +118,7 @@ $reels = $pdo->query("SELECT * FROM instagram_gallery ORDER BY sort_order ASC, i
                   </span>
                 </td>
                 <td style="text-align:right;">
-                  <a href="instagram.php?delete=<?= $r['id'] ?>&csrf_token=<?= csrfToken() ?>" onclick="return confirm('Are you sure you want to delete this Instagram reel?');" class="btn-admin btn-admin-danger btn-admin-sm" style="padding:6px;" title="Delete">
+                  <a href="instagram?delete=<?= $r['id'] ?>&csrf_token=<?= csrfToken() ?>" onclick="return confirm('Are you sure you want to delete this Instagram reel?');" class="btn-admin btn-admin-danger btn-admin-sm" style="padding:6px;" title="Delete">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                   </a>
                 </td>
@@ -133,7 +133,7 @@ $reels = $pdo->query("SELECT * FROM instagram_gallery ORDER BY sort_order ASC, i
   <!-- Right Side: Add New Reel Form -->
   <div class="admin-card">
     <h3 style="margin-top:0; font-size:1.15rem; font-weight:700; margin-bottom: 20px;">Link New Reel</h3>
-    <form action="instagram.php" method="POST" enctype="multipart/form-data">
+    <form action="instagram" method="POST" enctype="multipart/form-data">
       <?= csrfField() ?>
       
       <div class="form-group">

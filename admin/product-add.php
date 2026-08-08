@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         setFlash('success', 'Product created successfully.');
-        redirectTo('admin/products.php');
+        redirectTo('admin/products');
     }
 }
 ?>
@@ -101,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </div>
 <?php endif; ?>
 
-<form action="product-add.php" method="POST" enctype="multipart/form-data">
+<form action="product-add" method="POST" enctype="multipart/form-data">
   <?= csrfField() ?>
   
   <div class="admin-grid-2-1">

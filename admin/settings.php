@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     setFlash('success', 'Global settings updated successfully.');
-    redirectTo('admin/settings.php');
+    redirectTo('admin/settings');
 }
 
 $status = getEmailServiceStatus();
@@ -62,7 +62,7 @@ $status = getEmailServiceStatus();
   </div>
 </div>
 
-<form action="settings.php" method="POST" enctype="multipart/form-data">
+<form action="settings" method="POST" enctype="multipart/form-data">
   <?= csrfField() ?>
   
   <div class="admin-grid-2">
