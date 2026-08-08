@@ -155,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
 ?>
 
 <div class="admin-page-header">
-  <h2>Bulk CSV Importer</h2>
+  <h2>Product Import / Export</h2>
 </div>
 
 <?php if ($summary): ?>
@@ -178,22 +178,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
   </div>
 <?php endif; ?>
 
-<div class="admin-card" style="max-width:640px;">
-  <h3 style="margin-top: 0; font-size: 1.15rem; font-weight: 700; margin-bottom: 12px;">Upload WooCommerce Export CSV</h3>
-  <p style="color: var(--text-muted); font-size:0.875rem; margin-bottom:24px; line-height: 1.5;">
-    Upload your standard WooCommerce exported products CSV catalog file. The importer engine will automatically map matching categories, download media files, process stock levels, and set product attributes.
-  </p>
+<div class="admin-grid-1-2">
+  
+  <!-- Import Card -->
+  <div class="admin-card">
+    <h3 style="margin-top: 0; font-size: 1.15rem; font-weight: 700; margin-bottom: 12px;">Bulk CSV Importer</h3>
+    <p style="color: var(--text-muted); font-size:0.875rem; margin-bottom:24px; line-height: 1.5; min-height: 60px;">
+      Upload your standard WooCommerce exported products CSV catalog file. The importer engine will automatically map categories, download media, set prices and stock levels.
+    </p>
 
-  <form action="import" method="POST" enctype="multipart/form-data">
-    <?= csrfField() ?>
-    
-    <div class="form-group">
-      <label class="field-label">Select catalog CSV file *</label>
-      <input type="file" name="csv_file" accept=".csv" class="form-control" required>
+    <form action="import" method="POST" enctype="multipart/form-data">
+      <?= csrfField() ?>
+      
+      <div class="form-group" style="margin-bottom: 20px;">
+        <label class="field-label">Select catalog CSV file *</label>
+        <input type="file" name="csv_file" accept=".csv" class="form-control" required>
+      </div>
+
+      <button type="submit" class="btn-admin btn-admin-gold btn-full" style="margin-top: 16px;">Start CSV Import</button>
+    </form>
+  </div>
+
+  <!-- Export Card -->
+  <div class="admin-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+    <div>
+      <h3 style="margin-top: 0; font-size: 1.15rem; font-weight: 700; margin-bottom: 12px;">Bulk CSV Exporter</h3>
+      <p style="color: var(--text-muted); font-size:0.875rem; margin-bottom:24px; line-height: 1.5; min-height: 60px;">
+        Download your entire product catalogue as a WooCommerce-compatible CSV file. This contains names, SKUs, category maps, prices, sale prices, stock values, image filenames, and descriptions.
+      </p>
     </div>
 
-    <button type="submit" class="btn-admin btn-admin-gold btn-full" style="margin-top: 16px;">Start CSV Import</button>
-  </form>
+    <div style="margin-top: 24px;">
+      <a href="export" class="btn-admin btn-admin-primary btn-full" style="display: block; text-align: center; text-decoration: none; padding: 12px 0;">Download Product Catalogue (CSV)</a>
+    </div>
+  </div>
+
 </div>
 
 <?php require_once __DIR__ . '/includes/admin-footer.php'; ?>

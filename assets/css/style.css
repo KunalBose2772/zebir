@@ -1084,20 +1084,42 @@ input:focus, select:focus, textarea:focus {
 /* Footer socials */
 .footer-socials {
   display: flex;
-  gap: 10px;
-  margin-top: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
 }
 
 .footer-social-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.3s ease, opacity 0.3s ease;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #f7f3eb;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+}
+
+.footer-social-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+  transition: transform 0.3s ease;
 }
 
 .footer-social-btn:hover {
-  transform: translateY(-3px) scale(1.08);
-  opacity: 0.9;
+  background: var(--accent-gold);
+  border-color: var(--accent-gold);
+  color: #0d0d0d;
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 8px 24px rgba(200, 150, 12, 0.35);
+}
+
+.footer-social-btn:hover svg {
+  transform: scale(1.15);
 }
 
 /* Footer contact list */
