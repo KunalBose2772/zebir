@@ -67,6 +67,7 @@ if (empty($heroSlides)) {
   <div class="swiper-wrapper">
     <?php foreach ($heroSlides as $slide):
       $slideImage = $slide['image'] ? bannerImageUrl($slide['image']) : assetUrl('images/banner-placeholder.jpg');
+      $mobileImage = $slide['image'] ? bannerMobileImageUrl($slide['image']) : $slideImage;
       $slideLink = filter_var(trim($slide['link'] ?? ''), FILTER_SANITIZE_URL);
       $hasContent = $heroMode === 'content' && (!empty($slide['title']) || !empty($slide['description']) || !empty($slide['button_text']));
     ?>
@@ -74,7 +75,10 @@ if (empty($heroSlides)) {
         <?php if ($slideLink): ?>
           <a href="<?= e($slideLink) ?>" class="hero-slide-link" <?= strpos($slideLink, 'http') === 0 ? 'target="_blank" rel="noopener"' : '' ?>></a>
         <?php endif; ?>
-        <img src="<?= e($slideImage) ?>" alt="<?= e($slide['title'] ?: 'Featured slide') ?>" loading="eager">
+        <picture>
+          <source media="(max-width: 768px)" srcset="<?= e($mobileImage) ?>">
+          <img src="<?= e($slideImage) ?>" alt="<?= e($slide['title'] ?: 'Featured slide') ?>" loading="eager">
+        </picture>
         <div class="hero-overlay"></div>
         <?php if ($hasContent): ?>
           <div class="container hero-content">

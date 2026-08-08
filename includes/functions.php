@@ -197,11 +197,93 @@ function isInWishlist(int $productId): bool {
 
 // ── Image Helpers ──────────────────────────────────────────────
 function productImageUrl(string $img): string {
-    return $img ? UPLOAD_PRODUCTS_URL . $img : BASE_URL . 'assets/images/placeholder.jpg';
+    if (!$img) {
+        return BASE_URL . 'assets/images/placeholder.jpg';
+    }
+
+    $webpImg = preg_replace('/\.(png|jpe?g)$/i', '.webp', $img);
+    
+    // Check uploads first
+    $uploadWebpCandidate = BASE_PATH . 'uploads/products/' . ltrim($webpImg, '/');
+    if (file_exists($uploadWebpCandidate)) {
+        return UPLOAD_PRODUCTS_URL . ltrim($webpImg, '/');
+    }
+
+    // Check assets/images next
+    $assetWebpCandidate = BASE_PATH . 'assets/images/' . ltrim($webpImg, '/');
+    if (file_exists($assetWebpCandidate)) {
+        return assetUrl('images/' . ltrim($webpImg, '/'));
+    }
+
+    return UPLOAD_PRODUCTS_URL . ltrim($img, '/');
 }
 
 function bannerImageUrl(string $img): string {
-    return $img ? UPLOAD_BANNERS_URL . $img : BASE_URL . 'assets/images/banner-placeholder.jpg';
+    if (!$img) {
+        return BASE_URL . 'assets/images/banner-placeholder.jpg';
+    }
+
+    $webpImg = preg_replace('/\.(png|jpe?g)$/i', '.webp', $img);
+
+    // 1. Check if the image exists in assets/images/
+    $assetWebpCandidate = BASE_PATH . 'assets/images/' . ltrim($webpImg, '/');
+    if (file_exists($assetWebpCandidate)) {
+        return assetUrl('images/' . ltrim($webpImg, '/'));
+    }
+    $assetCandidate = BASE_PATH . 'assets/images/' . ltrim($img, '/');
+    if (file_exists($assetCandidate)) {
+        return assetUrl('images/' . ltrim($img, '/'));
+    }
+
+    // 2. Otherwise check in uploads/banners/
+    $uploadWebpCandidate = BASE_PATH . 'uploads/banners/' . ltrim($webpImg, '/');
+    if (file_exists($uploadWebpCandidate)) {
+        return UPLOAD_BANNERS_URL . ltrim($webpImg, '/');
+    }
+
+    return UPLOAD_BANNERS_URL . ltrim($img, '/');
+}
+
+function bannerMobileImageUrl(string $img): string {
+    if (!$img) {
+        return BASE_URL . 'assets/images/banner-placeholder.jpg';
+    }
+
+    // 1. Check if the image name contains "_DESKTOP" and replace it with "_MOBILE"
+    if (stripos($img, '_DESKTOP') !== false) {
+        $mobileImg = str_ireplace('_DESKTOP', '_MOBILE', $img);
+        $webpMobileImg = preg_replace('/\.(png|jpe?g)$/i', '.webp', $mobileImg);
+        
+        $assetWebpCandidate = BASE_PATH . 'assets/images/' . ltrim($webpMobileImg, '/');
+        if (file_exists($assetWebpCandidate)) {
+            return assetUrl('images/' . ltrim($webpMobileImg, '/'));
+        }
+
+        $assetCandidate = BASE_PATH . 'assets/images/' . ltrim($mobileImg, '/');
+        if (file_exists($assetCandidate)) {
+            return assetUrl('images/' . ltrim($mobileImg, '/'));
+        }
+    }
+
+    // 2. For custom uploaded banners, check if a mobile version exists with "_mobile" suffix
+    $pathInfo = pathinfo($img);
+    $ext = $pathInfo['extension'] ?? '';
+    $filename = $pathInfo['filename'] ?? '';
+    
+    $webpMobileFilename = preg_replace('/_desktop$/i', '', $filename) . '_mobile.webp';
+    $uploadWebpMobileCandidate = BASE_PATH . 'uploads/banners/' . $webpMobileFilename;
+    if (file_exists($uploadWebpMobileCandidate)) {
+        return UPLOAD_BANNERS_URL . $webpMobileFilename;
+    }
+
+    $mobileFilename = preg_replace('/_desktop$/i', '', $filename) . '_mobile.' . $ext;
+    $uploadMobileCandidate = BASE_PATH . 'uploads/banners/' . $mobileFilename;
+    if (file_exists($uploadMobileCandidate)) {
+        return UPLOAD_BANNERS_URL . $mobileFilename;
+    }
+
+    // Fallback: return the desktop webp banner if available, or original
+    return bannerImageUrl($img);
 }
 
 function categoryImageUrl(string $img): string {
@@ -209,12 +291,25 @@ function categoryImageUrl(string $img): string {
         return BASE_URL . 'assets/images/placeholder.jpg';
     }
 
+    $webpImg = preg_replace('/\.(png|jpe?g)$/i', '.webp', $img);
+
+    // Check assets first (both original and webp)
+    $assetWebpCandidate = BASE_PATH . 'assets/images/' . ltrim($webpImg, '/');
+    if (file_exists($assetWebpCandidate)) {
+        return assetUrl('images/' . ltrim($webpImg, '/'));
+    }
     $assetCandidate = BASE_PATH . 'assets/images/' . ltrim($img, '/');
     if (file_exists($assetCandidate)) {
         return assetUrl('images/' . ltrim($img, '/'));
     }
 
-    return UPLOAD_URL . 'products/' . ltrim($img, '/');
+    // Check uploads/products next (both original and webp)
+    $uploadWebpCandidate = BASE_PATH . 'uploads/products/' . ltrim($webpImg, '/');
+    if (file_exists($uploadWebpCandidate)) {
+        return UPLOAD_PRODUCTS_URL . ltrim($webpImg, '/');
+    }
+
+    return UPLOAD_PRODUCTS_URL . ltrim($img, '/');
 }
 
 function getHomepageCategoryDefaults(): array {
@@ -237,23 +332,54 @@ function getSettingArray(string $key, array $default = []): array {
     return is_array($decoded) ? $decoded : $default;
 }
 
+function resizeAndConvertToWebP(string $path, string $destPath, int $maxW, int $maxH, int $quality = 82): bool {
+    [$srcW, $srcH, $type] = @getimagesize($path);
+    if (!$srcW) return false;
+
+    $ratio = min($maxW / $srcW, $maxH / $srcH, 1);
+    $newW  = (int)($srcW * $ratio);
+    $newH  = (int)($srcH * $ratio);
+
+    $src = match($type) {
+        IMAGETYPE_JPEG => @imagecreatefromjpeg($path),
+        IMAGETYPE_PNG  => @imagecreatefrompng($path),
+        IMAGETYPE_WEBP => @imagecreatefromwebp($path),
+        default        => null,
+    };
+    if (!$src) return false;
+
+    $dst = imagecreatetruecolor($newW, $newH);
+    if ($type === IMAGETYPE_PNG || $type === IMAGETYPE_WEBP) {
+        imagealphablending($dst, false);
+        imagesavealpha($dst, true);
+    }
+    imagecopyresampled($dst, $src, 0, 0, 0, 0, $newW, $newH, $srcW, $srcH);
+
+    $success = imagewebp($dst, $destPath, $quality);
+
+    imagedestroy($src);
+    imagedestroy($dst);
+
+    return $success;
+}
+
 function uploadImage(array $file, string $destDir, int $width = 800, int $height = 1000): string|false {
     $allowed = ['image/jpeg', 'image/png', 'image/webp'];
     if (!in_array($file['type'], $allowed)) return false;
     if ($file['size'] > 5 * 1024 * 1024) return false;
 
-    $ext      = pathinfo($file['name'], PATHINFO_EXTENSION);
-    $filename = uniqid('img_') . '.' . $ext;
+    $filename = uniqid('img_') . '.webp';
     $dest     = rtrim($destDir, '/') . '/' . $filename;
 
     if (!is_dir($destDir)) mkdir($destDir, 0755, true);
 
-    if (!move_uploaded_file($file['tmp_name'], $dest)) return false;
+    $tempFile = rtrim($destDir, '/') . '/temp_' . uniqid() . '_' . basename($file['name']);
+    if (!move_uploaded_file($file['tmp_name'], $tempFile)) return false;
 
-    // Resize with GD
-    resizeImage($dest, $width, $height);
+    $success = resizeAndConvertToWebP($tempFile, $dest, $width, $height);
+    @unlink($tempFile);
 
-    return $filename;
+    return $success ? $filename : false;
 }
 
 function resizeImage(string $path, int $maxW, int $maxH): void {
