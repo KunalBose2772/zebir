@@ -10,13 +10,15 @@ $pageTitle = $pageTitle ?? getSetting('seo_title', 'ZEBIR LIBAS – Premium Fash
 $pageDesc  = $pageDesc  ?? getSetting('seo_description', 'Curated luxury fashion collections.');
 $currentTheme = getTheme();
 
-// Fetch All Active Categories for Mega Menu
+// Fetch All Active Categories for Mega Menu — split into 4 columns
 $pdo = getDB();
 $allActiveCategories = $pdo->query("SELECT * FROM categories WHERE is_active = 1 ORDER BY sort_order ASC, name ASC")->fetchAll();
 $totalCats = count($allActiveCategories);
-$half = ceil($totalCats / 2);
-$exclusiveCats = array_slice($allActiveCategories, 0, $half);
-$otherCats = array_slice($allActiveCategories, $half);
+$colSize = (int)ceil($totalCats / 4);
+$menuCol1 = array_slice($allActiveCategories, 0, $colSize);
+$menuCol2 = array_slice($allActiveCategories, $colSize, $colSize);
+$menuCol3 = array_slice($allActiveCategories, $colSize * 2, $colSize);
+$menuCol4 = array_slice($allActiveCategories, $colSize * 3);
 ?>
 <!DOCTYPE html>
 <html lang="en" data-theme="<?= e($currentTheme) ?>">
@@ -85,22 +87,41 @@ $heroModeClass = ($isIndex && $heroMode === 'image') ? 'hero-image-only' : '';
           <li class="nav-item-has-megamenu">
             <a href="<?= pageUrl('shop') ?>" class="nav-link <?= activeClass('shop.php') ?>">Collection <span style="font-size:0.5rem; vertical-align:middle; margin-left:3px;">▼</span></a>
             <div class="megamenu">
-              <?php if (!empty($exclusiveCats)): ?>
+              <?php if (!empty($menuCol1)): ?>
               <div>
-                <h4 class="megamenu-title">Exclusive Collection</h4>
+                <h4 class="megamenu-title">Collections</h4>
                 <ul class="megamenu-list">
-                  <?php foreach ($exclusiveCats as $cat): ?>
+                  <?php foreach ($menuCol1 as $cat): ?>
                     <li><a href="<?= categoryUrl($cat['slug']) ?>"><?= e($cat['name']) ?></a></li>
                   <?php endforeach; ?>
                 </ul>
               </div>
               <?php endif; ?>
-              
-              <?php if (!empty($otherCats)): ?>
+              <?php if (!empty($menuCol2)): ?>
               <div>
-                <h4 class="megamenu-title">Other Categories</h4>
+                <h4 class="megamenu-title">Fabrics</h4>
                 <ul class="megamenu-list">
-                  <?php foreach ($otherCats as $cat): ?>
+                  <?php foreach ($menuCol2 as $cat): ?>
+                    <li><a href="<?= categoryUrl($cat['slug']) ?>"><?= e($cat['name']) ?></a></li>
+                  <?php endforeach; ?>
+                </ul>
+              </div>
+              <?php endif; ?>
+              <?php if (!empty($menuCol3)): ?>
+              <div>
+                <h4 class="megamenu-title">Ethnic Wear</h4>
+                <ul class="megamenu-list">
+                  <?php foreach ($menuCol3 as $cat): ?>
+                    <li><a href="<?= categoryUrl($cat['slug']) ?>"><?= e($cat['name']) ?></a></li>
+                  <?php endforeach; ?>
+                </ul>
+              </div>
+              <?php endif; ?>
+              <?php if (!empty($menuCol4)): ?>
+              <div>
+                <h4 class="megamenu-title">More</h4>
+                <ul class="megamenu-list">
+                  <?php foreach ($menuCol4 as $cat): ?>
                     <li><a href="<?= categoryUrl($cat['slug']) ?>"><?= e($cat['name']) ?></a></li>
                   <?php endforeach; ?>
                 </ul>

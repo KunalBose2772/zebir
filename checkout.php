@@ -386,26 +386,184 @@ require_once __DIR__ . '/includes/header.php';
               <span style="font-weight:600; text-align:left;">UPI Direct Transfer (Zero Charges)</span>
             </label>
             
-            <!-- UPI Details Display -->
+            <!-- UPI Details Display — Professional Layout -->
             <div id="upiDetailsSection" style="display: <?= !$enableCod ? 'block' : 'none' ?>; margin-top:16px; padding-top:16px; border-top:1px solid var(--border-color);">
-              <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">
-                Scan the QR code below or use the UPI ID to pay <strong><?= formatPrice($grandTotal) ?></strong> directly to our bank account. Upload your payment screenshot to verify.
+
+              <!-- Intro text -->
+              <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:16px; line-height:1.6;">
+                Pay <strong style="color:var(--text-main);"><?= formatPrice($grandTotal) ?></strong> via UPI — zero extra charges. Scan the QR or use the UPI ID below, then upload your payment screenshot.
               </p>
-              
-              <div class="text-center mb-3">
+
+              <!-- Desktop: Two-column QR + UPI ID panel -->
+              <div class="upi-payment-panel">
+                <!-- QR Code Column -->
                 <?php if ($upiQr): ?>
-                  <img src="<?= UPLOAD_URL . 'qr/' . e($upiQr) ?>" alt="UPI QR Code" style="width:180px; height:180px; object-fit:contain; border:1px solid var(--border-color); padding:8px;">
+                <div class="upi-qr-col">
+                  <div class="upi-qr-frame">
+                    <img src="<?= UPLOAD_URL . 'qr/' . e($upiQr) ?>" alt="UPI QR Code – <?= e($upiId) ?>" class="upi-qr-img">
+                  </div>
+                  <span class="upi-scan-label">Scan with any UPI app</span>
+                </div>
                 <?php endif; ?>
-                <div class="mt-2" style="font-weight:600; font-size:1.1rem; letter-spacing:1px; color:var(--accent-gold);">
-                  UPI ID: <?= e($upiId) ?>
+
+                <!-- UPI ID + Actions Column -->
+                <div class="upi-info-col">
+                  <div class="upi-id-label">UPI ID</div>
+                  <div class="upi-id-value" id="upiIdDisplay"><?= e($upiId) ?></div>
+                  <button type="button" class="upi-copy-btn" onclick="copyUpiId()" id="upiCopyBtn">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    Copy UPI ID
+                  </button>
+
+                  <!-- Mobile-only PhonePe Payment Link -->
+                  <?php
+                    $phonepeAmount = number_format((float)$grandTotal, 2, '.', '');
+                    $phonepeUrl = "phonepe://pay?pa=" . urlencode($upiId) . "&pn=" . urlencode(getSetting('site_name','Zebir Libas')) . "&am=" . $phonepeAmount . "&cu=INR";
+                    $genericUpiUrl = "upi://pay?pa=" . urlencode($upiId) . "&pn=" . urlencode(getSetting('site_name','Zebir Libas')) . "&am=" . $phonepeAmount . "&cu=INR&tn=" . urlencode('Payment for Zebir Libas order');
+                  ?>
+                  <a href="<?= e($genericUpiUrl) ?>" class="upi-pay-link" id="upiPayLink">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+                    Pay ₹<?= $phonepeAmount ?> via UPI App
+                  </a>
+                  <span class="upi-pay-link-hint">Opens PhonePe / GPay / Paytm automatically</span>
                 </div>
               </div>
 
-              <div>
-                <label class="d-block font-weight-bold mb-1" style="font-size:0.8rem; text-transform:uppercase;">Upload Payment Screenshot *</label>
-                <input type="file" name="payment_screenshot" accept="image/*" class="newsletter-input" style="width:100%;">
+              <!-- Screenshot Upload -->
+              <div class="upi-screenshot-upload">
+                <label class="upi-screenshot-label">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                  Upload Payment Screenshot <span style="color:#e74c3c;">*</span>
+                </label>
+                <input type="file" name="payment_screenshot" accept="image/*" class="newsletter-input upi-file-input" capture="environment">
+                <p class="upi-screenshot-hint">Take a screenshot after payment and upload here for order verification.</p>
               </div>
+
             </div>
+
+            <style>
+            /* UPI Payment Panel */
+            .upi-payment-panel {
+              display: flex;
+              gap: 20px;
+              align-items: flex-start;
+              background: var(--bg-secondary);
+              border: 1px solid var(--border-color);
+              border-radius: 8px;
+              padding: 20px;
+              margin-bottom: 20px;
+            }
+            .upi-qr-col { flex-shrink: 0; text-align: center; }
+            .upi-qr-frame {
+              background: #fff;
+              border: 1px solid var(--border-color);
+              border-radius: 8px;
+              padding: 10px;
+              display: inline-block;
+              box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            }
+            .upi-qr-img { width: 140px; height: 140px; object-fit: contain; display: block; }
+            .upi-scan-label {
+              display: block;
+              font-size: 0.68rem;
+              color: var(--text-muted);
+              margin-top: 8px;
+              letter-spacing: 0.5px;
+              text-transform: uppercase;
+            }
+            .upi-info-col { flex-grow: 1; }
+            .upi-id-label {
+              font-size: 0.68rem;
+              text-transform: uppercase;
+              letter-spacing: 1.5px;
+              color: var(--text-muted);
+              font-weight: 700;
+              margin-bottom: 4px;
+            }
+            .upi-id-value {
+              font-size: 1.05rem;
+              font-weight: 700;
+              color: var(--accent-gold);
+              letter-spacing: 0.5px;
+              word-break: break-all;
+              margin-bottom: 10px;
+              font-family: var(--font-body);
+            }
+            .upi-copy-btn {
+              display: inline-flex;
+              align-items: center;
+              gap: 6px;
+              background: none;
+              border: 1.5px solid var(--accent-gold);
+              color: var(--accent-gold);
+              padding: 7px 14px;
+              border-radius: 4px;
+              font-size: 0.72rem;
+              font-weight: 700;
+              letter-spacing: 0.8px;
+              cursor: pointer;
+              transition: all 0.2s;
+              margin-bottom: 14px;
+            }
+            .upi-copy-btn:hover { background: var(--accent-gold); color: #fff; }
+            .upi-copy-btn.copied { background: #10b981; border-color: #10b981; color: #fff; }
+            /* Mobile UPI Pay link — hidden on desktop */
+            .upi-pay-link {
+              display: none;
+              align-items: center;
+              gap: 8px;
+              background: #5f259f;
+              color: #fff;
+              text-decoration: none;
+              padding: 12px 20px;
+              border-radius: 6px;
+              font-size: 0.85rem;
+              font-weight: 700;
+              letter-spacing: 0.5px;
+              margin-bottom: 6px;
+              transition: background 0.2s, transform 0.15s;
+            }
+            .upi-pay-link:hover { background: #4a1a80; transform: translateY(-1px); color: #fff; }
+            .upi-pay-link-hint {
+              display: none;
+              font-size: 0.68rem;
+              color: var(--text-muted);
+              margin-bottom: 12px;
+            }
+            @media (max-width: 640px) {
+              .upi-payment-panel { flex-direction: column; align-items: center; text-align: center; }
+              .upi-info-col { width: 100%; text-align: center; }
+              .upi-copy-btn { margin-bottom: 10px; }
+              .upi-pay-link { display: flex; width: 100%; justify-content: center; }
+              .upi-pay-link-hint { display: block; text-align: center; }
+              .upi-qr-img { width: 160px; height: 160px; }
+            }
+            .upi-screenshot-upload {
+              background: var(--bg-secondary);
+              border: 1px dashed var(--border-color);
+              border-radius: 8px;
+              padding: 16px;
+            }
+            .upi-screenshot-label {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              font-size: 0.78rem;
+              font-weight: 700;
+              text-transform: uppercase;
+              letter-spacing: 1px;
+              color: var(--text-main);
+              margin-bottom: 10px;
+            }
+            .upi-file-input { width: 100%; border-radius: 4px; }
+            .upi-screenshot-hint {
+              font-size: 0.72rem;
+              color: var(--text-muted);
+              margin-top: 8px;
+              margin-bottom: 0;
+              line-height: 1.5;
+            }
+            </style>
           </div>
 
         </div>
@@ -496,6 +654,35 @@ function showAddressForm() {
 
 function toggleUpiSection(show) {
   document.getElementById('upiDetailsSection').style.display = show ? 'block' : 'none';
+}
+
+function copyUpiId() {
+  var el = document.getElementById('upiIdDisplay');
+  var btn = document.getElementById('upiCopyBtn');
+  if (!el || !btn) return;
+  var text = el.textContent.trim();
+  navigator.clipboard.writeText(text).then(function() {
+    btn.classList.add('copied');
+    btn.innerHTML = '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
+    setTimeout(function() {
+      btn.classList.remove('copied');
+      btn.innerHTML = '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy UPI ID';
+    }, 2500);
+  }).catch(function() {
+    // Fallback for older browsers
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.innerHTML = '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
+    setTimeout(function() {
+      btn.innerHTML = '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy UPI ID';
+    }, 2500);
+  });
 }
 
 function applyCheckoutCoupon() {

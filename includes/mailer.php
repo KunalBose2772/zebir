@@ -61,6 +61,12 @@ function sendMail(string $toEmail, string $toName, string $subject, string $html
     $smtpUser = trim(getSetting('smtp_user'));
     $smtpPass = trim(getSetting('smtp_pass'));
 
+    // Force the From email to match the authenticated SMTP user if they are both defined and SMTP user is a valid email.
+    // This resolves the "553 5.7.1 Sender address rejected: not owned by user" error on strict SMTP servers like Hostinger.
+    if (!empty($smtpUser) && filter_var($smtpUser, FILTER_VALIDATE_EMAIL)) {
+        $fromEmail = $smtpUser;
+    }
+
     if (!$smtpHost || !$smtpPort || !filter_var($fromEmail, FILTER_VALIDATE_EMAIL)) {
         $error = 'SMTP configuration incomplete or sender email invalid.';
         $pdo = getDB();
@@ -187,15 +193,22 @@ function sendOrderConfirmationEmail(array $order, array $items): void {
     // Email customer
     sendMail($order['shipping_email'], $order['shipping_name'], 'Order Confirmed – ' . $order['order_number'], emailWrapper($content));
 
-    // Email admin
-    $adminEmail = getSetting('site_email', 'zebirlibas@gmail.com');
-    $adminContent = "<h2>New Order Received!</h2>
-    <p>A new order has been successfully placed on Zebir Libas.</p>
-    <p><strong>Order Number:</strong> {$order['order_number']}</p>
-    <p><strong>Customer Name:</strong> {$order['shipping_name']}</p>
-    <p><strong>Customer Email:</strong> {$order['shipping_email']}</p>
-    <p><strong>Total Amount:</strong> " . formatPrice($order['total']) . "</p>
-    <p><strong>Payment Method:</strong> " . strtoupper($order['payment_method']) . "</p>
+    // Email admin — always use the hardcoded ADMIN_EMAIL constant as guaranteed fallback
+    $adminEmail = defined('ADMIN_EMAIL') ? ADMIN_EMAIL : 'zebirlibas@gmail.com';
+    // Also send to site_email if it's a different valid address
+    $siteEmail = trim(getSetting('site_email', ''));
+    
+    $orderDetailUrl = BASE_URL . 'admin/order-detail?id=' . ($order['id'] ?? '');
+    $adminContent = "<h2>🛒 New Order Received!</h2>
+    <p>A new order has been placed on <strong>Zebir Libas</strong>.</p>
+    <table class='order-table'>
+      <tr><th>Field</th><th>Detail</th></tr>
+      <tr><td>Order Number</td><td><strong>{$order['order_number']}</strong></td></tr>
+      <tr><td>Customer Name</td><td>{$order['shipping_name']}</td></tr>
+      <tr><td>Customer Email</td><td>{$order['shipping_email']}</td></tr>
+      <tr><td>Total Amount</td><td><strong>" . formatPrice($order['total']) . "</strong></td></tr>
+      <tr><td>Payment Method</td><td>" . strtoupper($order['payment_method']) . "</td></tr>
+    </table>
     <hr class='divider'>
     <table class='order-table'>
       <tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th></tr>
@@ -203,9 +216,15 @@ function sendOrderConfirmationEmail(array $order, array $items): void {
       <tr class='total-row'><td colspan='3'>Grand Total</td><td>" . formatPrice($order['total']) . "</td></tr>
     </table>
     <br>
-    <a href='" . BASE_URL . "admin/order-detail.php?id=" . urlencode($order['id'] ?? '') . "' class='btn'>VIEW ORDER IN ADMIN PANEL</a>";
+    <a href='{$orderDetailUrl}' class='btn'>VIEW ORDER IN ADMIN PANEL</a>";
 
-    sendMail($adminEmail, 'Zebir Libas Admin', 'New Order Received – ' . $order['order_number'], emailWrapper($adminContent));
+    // Send to primary admin email (hardcoded constant)
+    sendMail($adminEmail, 'Zebir Libas Admin', '🛒 New Order – ' . $order['order_number'], emailWrapper($adminContent));
+    
+    // Also CC site_email if different from ADMIN_EMAIL
+    if ($siteEmail && filter_var($siteEmail, FILTER_VALIDATE_EMAIL) && strtolower($siteEmail) !== strtolower($adminEmail)) {
+        sendMail($siteEmail, 'Zebir Libas', '🛒 New Order – ' . $order['order_number'], emailWrapper($adminContent));
+    }
 }
 
 function sendOrderStatusEmail(array $order, string $status): void {

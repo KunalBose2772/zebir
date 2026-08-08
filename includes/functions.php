@@ -5,8 +5,8 @@
  */
 
 // ── Sanitize & Escape ──────────────────────────────────────────
-function e(string $str): string {
-    return htmlspecialchars($str, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+function e(?string $str): string {
+    return htmlspecialchars((string)$str, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 }
 
 function sanitize(string $str): string {
@@ -51,6 +51,10 @@ function uniqueSlug(string $table, string $text, int $excludeId = 0): string {
 // ── Price Formatting ───────────────────────────────────────────
 function formatPrice(float $amount): string {
     $symbol = getSetting('currency_symbol', '₹');
+    // Fallback: if DB returned garbled bytes, use the HTML entity directly
+    if (!mb_check_encoding($symbol, 'UTF-8') || $symbol === '???') {
+        $symbol = '₹';
+    }
     return $symbol . number_format($amount, 2);
 }
 
@@ -80,7 +84,8 @@ function isAdminLoggedIn(): bool {
 }
 
 function requireLogin(): void {
-    if (!isLoggedIn()) {
+    if (!isLoggedIn() || currentCustomer() === null) {
+        unset($_SESSION['customer_id'], $_SESSION['customer_name']);
         setFlash('error', 'Please login to continue.');
         redirectTo('login.php?redirect=' . urlencode($_SERVER['REQUEST_URI']));
     }

@@ -7,6 +7,10 @@ requireLogin();
 
 $pageTitle = "My Account – ZEBIR LIBAS";
 $customer = currentCustomer();
+if (!$customer) {
+    setFlash('error', 'Please login to continue.');
+    redirectTo('login.php');
+}
 $pdo = getDB();
 
 $msg = '';

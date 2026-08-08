@@ -77,6 +77,15 @@ html {
   scroll-behavior: smooth;
 }
 
+/* ── Hide scrollbars everywhere (scroll still works) ── */
+* {
+  scrollbar-width: none;        /* Firefox */
+  -ms-overflow-style: none;     /* IE / Edge Legacy */
+}
+*::-webkit-scrollbar {
+  display: none;                /* Chrome / Safari / Opera */
+}
+
 body {
   font-family: var(--font-body);
   background:
@@ -1412,14 +1421,14 @@ input:focus, select:focus, textarea:focus {
   top: 100%;
   left: 50%;
   transform: translateX(-50%) translateY(20px);
-  width: 780px;
+  width: min(1100px, 95vw);
   background-color: var(--bg-surface);
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-lg);
-  padding: 36px;
+  padding: 28px 32px;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 40px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 28px;
   opacity: 0;
   visibility: hidden;
   transition: var(--transition);
@@ -1449,7 +1458,7 @@ input:focus, select:focus, textarea:focus {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 7px;
 }
 
 .megamenu-list a {
