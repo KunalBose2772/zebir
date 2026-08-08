@@ -25,10 +25,10 @@ require_once __DIR__ . '/includes/header.php';
 
 <section class="py-5">
   <div class="container">
-    <div style="display: grid; grid-template-columns: 240px 1fr; gap: 48px;">
+    <div class="account-grid-layout">
       
       <!-- Account Sidebar -->
-      <aside style="border-right: 1px solid var(--border-color); padding-right: 24px;">
+      <aside style="border-right: 1px solid var(--border-color); padding-right: 24px;" class="account-sidebar">
         <ul style="list-style:none; line-height:2.2;">
           <li><a href="account.php">Profile Details</a></li>
           <li><a href="orders.php" style="font-weight:600; color:var(--accent-gold);">Order History</a></li>
@@ -47,7 +47,7 @@ require_once __DIR__ . '/includes/header.php';
               $items = $itemsStmt->fetchAll();
             ?>
               <div class="content-card" style="padding: 24px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:16px; margin-bottom:16px;">
+                <div class="order-card-header">
                   <div>
                     <span style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; display:block;">Order Placed</span>
                     <strong style="font-size:0.9rem;"><?= date('d M Y', strtotime($o['created_at'])) ?></strong>

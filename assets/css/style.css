@@ -3551,3 +3551,58 @@ input[type="radio"]:checked + .color-pill {
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
 }
+
+/* ============================================================
+   ZEBIR LIBAS – Responsive Account Dashboard Layout
+   ============================================================ */
+.account-grid-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 48px;
+}
+
+.order-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 991px) {
+  .account-grid-layout {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  
+  .account-grid-layout .account-sidebar {
+    border-right: none !important;
+    padding-right: 0 !important;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .order-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .order-card-header > div {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+    border-bottom: 1px dashed var(--border-color);
+    padding-bottom: 8px;
+  }
+  .order-card-header > div:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+    justify-content: flex-end;
+  }
+}

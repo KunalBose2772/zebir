@@ -45,10 +45,10 @@ require_once __DIR__ . '/includes/header.php';
 
 <section class="py-5">
   <div class="container">
-    <div style="display: grid; grid-template-columns: 240px 1fr; gap: 48px;">
+    <div class="account-grid-layout">
       
       <!-- Account Nav Sidebar -->
-      <aside class="content-card" style="padding: 1.25rem; border-right: 1px solid var(--border-color);">
+      <aside class="content-card account-sidebar" style="padding: 1.25rem; border-right: 1px solid var(--border-color);">
         <div class="mb-4">
           <h4 class="font-serif" style="font-size:1.25rem;"><?= e($customer['name']) ?></h4>
           <span style="font-size:0.8rem; color:var(--text-muted);"><?= e($customer['email']) ?></span>
