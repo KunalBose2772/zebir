@@ -88,7 +88,7 @@ function requireLogin(): void {
 
 function requireAdmin(): void {
     if (!isAdminLoggedIn()) {
-        redirectTo('admin/login.php');
+        redirectTo('admin/login');
     }
 }
 
@@ -493,7 +493,9 @@ function truncate(string $str, int $len = 100): string {
 
 function activeClass(string $page): string {
     $current = basename($_SERVER['PHP_SELF'] ?? '');
-    return ($current === $page) ? 'active' : '';
+    $pageClean = preg_replace('/\.php$/', '', $page);
+    $currentClean = preg_replace('/\.php$/', '', $current);
+    return ($currentClean === $pageClean) ? 'active' : '';
 }
 
 function assetUrl(string $path): string {

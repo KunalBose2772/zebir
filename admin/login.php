@@ -5,7 +5,7 @@
 require_once __DIR__ . '/../includes/bootstrap.php';
 
 if (isAdminLoggedIn()) {
-    redirectTo('admin/index.php');
+    redirectTo('admin/index');
 }
 
 $error = '';
@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($admin && verifyPassword($password, $admin['password'])) {
         $_SESSION['admin_id']   = $admin['id'];
         $_SESSION['admin_name'] = $admin['name'];
-        redirectTo('admin/index.php');
+        redirectTo('admin/index');
     } else {
         $error = 'Invalid admin credentials.';
     }
