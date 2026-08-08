@@ -1,5 +1,5 @@
 # Dependency directories
-/vendor/
+# /vendor/
 
 # Sensitive config files
 # config/database.php
