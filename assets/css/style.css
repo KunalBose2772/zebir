@@ -1085,7 +1085,7 @@ input:focus, select:focus, textarea:focus {
 .footer-socials {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 14px;
   margin-top: 24px;
   align-items: center;
 }
@@ -1099,14 +1099,14 @@ input:focus, select:focus, textarea:focus {
 }
 
 .footer-social-btn svg {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   display: block;
 }
 
 .footer-social-btn:hover {
-  transform: translateY(-4px) scale(1.12);
-  filter: brightness(1.1) drop-shadow(0 4px 12px rgba(255, 255, 255, 0.12));
+  transform: translateY(-4px) scale(1.1);
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.35));
 }
 
 /* Footer contact list */
