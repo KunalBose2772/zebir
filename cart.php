@@ -128,7 +128,7 @@ require_once __DIR__ . '/includes/header.php';
             </div>
 
             <!-- Coupon Input -->
-            <form action="cart.php" method="POST" class="coupon-form mb-4">
+            <form action="cart.php" method="POST" class="coupon-form mb-3">
               <?= csrfField() ?>
               <div class="coupon-input-group">
                 <input type="text" name="coupon_code" class="coupon-input" placeholder="Coupon Code" value="<?= e($appliedCoupon['code'] ?? '') ?>">
@@ -138,6 +138,14 @@ require_once __DIR__ . '/includes/header.php';
                 <span class="text-danger d-block mt-1" style="font-size:0.75rem;"><?= e($couponError) ?></span>
               <?php endif; ?>
             </form>
+
+            <!-- View Offers Button -->
+            <div class="mb-4" style="margin-top:-8px;">
+              <button type="button" class="btn-text-gold d-inline-flex align-items-center gap-2" onclick="openCouponsModal()" style="background:none; border:none; padding:0; cursor:pointer; color:var(--accent-gold); font-size:0.75rem; font-weight:700; letter-spacing:1px; text-transform:uppercase;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-top:-1px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path></svg>
+                View Available Offers
+              </button>
+            </div>
 
             <div style="border-top: 2px solid var(--border-color); padding-top: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: 700;">
               <span>Total</span>
@@ -178,4 +186,5 @@ function updateBagQty(key, newQty) {
 }
 </script>
 
+<?php require_once __DIR__ . '/includes/coupons-modal.php'; ?>
 <?php require_once __DIR__ . '/includes/footer.php'; ?>

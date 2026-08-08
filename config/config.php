@@ -58,6 +58,7 @@ define('IMG_BANNER', [1920, 800]);
 
 // Security
 define('CSRF_TOKEN_NAME', 'csrf_token');
+define('PAYMENT_SETTINGS_PASSWORD', 'ZebirPaySecure2026!');
 
 // Error reporting (set to 0 in production)
 if (IS_LOCAL) {

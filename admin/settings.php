@@ -10,12 +10,32 @@ $pdo = getDB();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verifyCsrf();
 
+    $isChangingUpiId = (isset($_POST['upi_id']) && sanitize($_POST['upi_id']) !== getSetting('upi_id'));
+    $isUploadingQrCode = (!empty($_FILES['upi_qr_code']['name']));
+    $isChangingCod = (isset($_POST['enable_cod']) && sanitize($_POST['enable_cod']) !== getSetting('enable_cod', '1'));
+
+    if ($isChangingUpiId || $isUploadingQrCode || $isChangingCod) {
+        $submittedPassword = $_POST['payment_settings_password'] ?? '';
+        if ($submittedPassword !== PAYMENT_SETTINGS_PASSWORD) {
+            setFlash('error', 'Authentication failed: Invalid Payment Settings Password.');
+            redirectTo('admin/settings');
+        }
+    }
+
     $settingsToUpdate = [
         'site_name', 'site_phone', 'site_whatsapp', 'site_email', 'site_address',
         'seo_title', 'seo_description', 'meta_keywords', 'google_analytics',
         'theme', 'currency', 'currency_symbol', 'shipping_charge', 'free_shipping_amount',
-        'upi_id', 'smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass', 'smtp_from_email', 'smtp_from_name'
+        'smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass', 'smtp_from_email', 'smtp_from_name'
     ];
+
+    if (!$isChangingUpiId || ($_POST['payment_settings_password'] ?? '') === PAYMENT_SETTINGS_PASSWORD) {
+        $settingsToUpdate[] = 'upi_id';
+    }
+
+    if (!$isChangingCod || ($_POST['payment_settings_password'] ?? '') === PAYMENT_SETTINGS_PASSWORD) {
+        $settingsToUpdate[] = 'enable_cod';
+    }
 
     $stmt = $pdo->prepare("INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`)");
 
@@ -26,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Process UPI QR Code upload
-    if (!empty($_FILES['upi_qr_code']['name'])) {
+    if ($isUploadingQrCode && ($_POST['payment_settings_password'] ?? '') === PAYMENT_SETTINGS_PASSWORD) {
         $qrName = uploadImage($_FILES['upi_qr_code'], UPLOAD_DIR . 'qr/', 600, 600);
         if ($qrName) {
             $stmt->execute(['upi_qr_code', $qrName]);
@@ -118,10 +138,21 @@ $status = getEmailServiceStatus();
     <!-- UPI Payment & SMTP Email Settings -->
     <div style="display:flex; flex-direction:column; gap:24px;">
       
-      <!-- UPI Details -->
-      <div class="admin-card">
-        <h3 style="margin-top:0; font-size:1.15rem; font-weight:700; margin-bottom: 20px;">UPI Payment Gateway</h3>
+      <!-- Payment Settings -->
+      <div class="admin-card" style="border: 1px solid var(--accent-gold); position: relative;">
+        <div style="position: absolute; top: 12px; right: 16px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-gold); background: rgba(200, 150, 12, 0.1); padding: 4px 8px; border-radius: 4px;">Protected</div>
+        <h3 style="margin-top:0; font-size:1.15rem; font-weight:700; margin-bottom: 20px; color: var(--accent-gold);">Payment Settings</h3>
         
+        <!-- Cash on Delivery Toggle -->
+        <div class="form-group" style="margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px dashed var(--border-color);">
+          <label class="field-label" style="font-weight: 700;">Cash on Delivery (COD)</label>
+          <select name="enable_cod" class="form-control" style="max-width: 200px;">
+            <option value="1" <?= getSetting('enable_cod', '1') === '1' ? 'selected' : '' ?>>Enabled</option>
+            <option value="0" <?= getSetting('enable_cod', '1') === '0' ? 'selected' : '' ?>>Disabled</option>
+          </select>
+          <small style="color: var(--text-muted); font-size: 0.72rem; display: block; margin-top: 6px;">Toggle Cash on Delivery payment option at storefront checkout.</small>
+        </div>
+
         <div class="form-group">
           <label class="field-label">UPI ID</label>
           <input type="text" name="upi_id" class="form-control" placeholder="e.g. merchant@upi" value="<?= e(getSetting('upi_id')) ?>">
@@ -133,6 +164,12 @@ $status = getEmailServiceStatus();
             <img src="<?= UPLOAD_URL . 'qr/' . e($qr) ?>" style="width:80px; height:80px; object-fit:contain; display:block; margin-bottom:12px; border:1px solid var(--border-color); border-radius:6px;">
           <?php endif; ?>
           <input type="file" name="upi_qr_code" accept="image/*" class="form-control">
+        </div>
+
+        <div class="form-group" style="margin-top: 24px; padding-top: 16px; border-top: 1px dashed var(--border-color);">
+          <label class="field-label" style="color: var(--accent-gold); font-weight: 700;">Payment Authorization Password</label>
+          <input type="password" name="payment_settings_password" class="form-control" style="border: 1px solid var(--accent-gold);" placeholder="Required only if changing payment settings">
+          <small style="color: var(--text-muted); font-size: 0.72rem; display: block; margin-top: 6px;">Changing payment configurations (COD toggle, UPI settings) requires entering the payment security password to authorize changes.</small>
         </div>
       </div>
 

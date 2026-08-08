@@ -24,11 +24,51 @@ $grandTotal = max(0, $subtotal - $discount + $shippingCharge);
 
 $upiId = getSetting('upi_id', 'zebir@upi');
 $upiQr = getSetting('upi_qr_code', '');
+$enableCod = getSetting('enable_cod', '1') === '1';
 
 $errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verifyCsrf();
+
+    // Check if applying coupon
+    if (isset($_POST['apply_coupon'])) {
+        $code = strtoupper(sanitize($_POST['coupon_code'] ?? ''));
+        if ($code) {
+            $pdo = getDB();
+            $stmt = $pdo->prepare("SELECT * FROM coupons WHERE code = ? AND is_active = 1 AND (expiry_date IS NULL OR expiry_date >= CURDATE())");
+            $stmt->execute([$code]);
+            $coupon = $stmt->fetch();
+
+            if ($coupon) {
+                $subtotal = cartTotal();
+                if ($subtotal >= $coupon['min_order_amount']) {
+                    if ($coupon['type'] === 'percentage') {
+                        $discount = ($subtotal * $coupon['value']) / 100;
+                    } else {
+                        $discount = (float)$coupon['value'];
+                    }
+                    $_SESSION['applied_coupon'] = [
+                        'code'     => $coupon['code'],
+                        'discount' => $discount
+                    ];
+                    setFlash('success', 'Coupon code applied successfully!');
+                } else {
+                    setFlash('error', 'Minimum order amount for this coupon is ' . formatPrice($coupon['min_order_amount']));
+                }
+            } else {
+                setFlash('error', 'Invalid or expired coupon code.');
+            }
+        }
+        redirectTo('checkout.php');
+    }
+
+    // Check if removing coupon
+    if (isset($_POST['remove_coupon'])) {
+        unset($_SESSION['applied_coupon']);
+        setFlash('success', 'Coupon code removed.');
+        redirectTo('checkout.php');
+    }
 
     $shippingName  = sanitize($_POST['shipping_name'] ?? '');
     $shippingPhone = sanitize($_POST['shipping_phone'] ?? '');
@@ -48,6 +88,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!$city)          $errors[] = 'City is required.';
     if (!$state)         $errors[] = 'State is required.';
     if (!$pincode)       $errors[] = 'Pincode is required.';
+
+    if ($paymentMethod === 'cod' && !$enableCod) {
+        $errors[] = 'Cash on Delivery is currently disabled. Please select UPI payment.';
+    }
 
     $paymentScreenshot = '';
     $orderStatus = 'pending';
@@ -327,21 +371,23 @@ require_once __DIR__ . '/includes/header.php';
           <!-- Payment Method Selection -->
           <h3 class="font-serif mb-4 mt-5" style="font-size: 1.5rem;">Payment Method</h3>
           
+          <?php if ($enableCod): ?>
           <div class="mb-3" style="border:1px solid var(--border-color); padding:16px; border-radius:4px;">
             <label style="cursor:pointer; display:flex; align-items:flex-start; justify-content:flex-start; gap:12px; margin:0;">
               <input type="radio" name="payment_method" value="cod" checked onclick="toggleUpiSection(false)" style="width:auto; margin-top:4px; flex-shrink:0;">
               <span style="font-weight:600; text-align:left;">Cash on Delivery (COD)</span>
             </label>
           </div>
+          <?php endif; ?>
 
           <div class="mb-3" style="border:1px solid var(--border-color); padding:16px; border-radius:4px;">
             <label style="cursor:pointer; display:flex; align-items:flex-start; justify-content:flex-start; gap:12px; margin:0;">
-              <input type="radio" name="payment_method" value="upi" onclick="toggleUpiSection(true)" style="width:auto; margin-top:4px; flex-shrink:0;">
+              <input type="radio" name="payment_method" value="upi" <?= !$enableCod ? 'checked' : '' ?> onclick="toggleUpiSection(true)" style="width:auto; margin-top:4px; flex-shrink:0;">
               <span style="font-weight:600; text-align:left;">UPI Direct Transfer (Zero Charges)</span>
             </label>
             
             <!-- UPI Details Display -->
-            <div id="upiDetailsSection" style="display:none; margin-top:16px; padding-top:16px; border-top:1px solid var(--border-color);">
+            <div id="upiDetailsSection" style="display: <?= !$enableCod ? 'block' : 'none' ?>; margin-top:16px; padding-top:16px; border-top:1px solid var(--border-color);">
               <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">
                 Scan the QR code below or use the UPI ID to pay <strong><?= formatPrice($grandTotal) ?></strong> directly to our bank account. Upload your payment screenshot to verify.
               </p>
@@ -396,6 +442,33 @@ require_once __DIR__ . '/includes/header.php';
                 <span>Shipping</span>
                 <span><?= $shippingCharge > 0 ? formatPrice($shippingCharge) : '<span class="text-success">FREE</span>' ?></span>
               </div>
+
+              <!-- Coupon/Promo Code Section -->
+              <div style="margin-top: 16px; margin-bottom: 20px; padding-top: 16px; border-top: 1px dashed var(--border-color);">
+                <label class="d-block font-weight-bold mb-2" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; color: var(--text-main);">Promo / Coupon Code</label>
+                <?php if ($appliedCoupon): ?>
+                  <div style="display:flex; align-items:center; justify-content:space-between; background:rgba(197, 168, 128, 0.08); padding:8px 12px; border-radius:4px; border:1px solid var(--accent-gold);">
+                    <div style="font-size:0.82rem; font-weight:600;">
+                      <span class="text-success" style="font-weight:700;"><?= e($appliedCoupon['code']) ?></span> Applied
+                    </div>
+                    <button type="button" onclick="removeCheckoutCoupon()" style="background:none; border:none; color:#f87171; font-weight:700; cursor:pointer; font-size:0.8rem; text-decoration:underline;">Remove</button>
+                  </div>
+                <?php else: ?>
+                  <div style="display:flex; gap:8px;">
+                    <input type="text" id="checkout_coupon_code" class="newsletter-input" style="flex-grow:1; border-radius:2px; height:38px; padding:0 12px;" placeholder="Enter code">
+                    <button type="button" id="apply_checkout_coupon_btn" onclick="applyCheckoutCoupon()" class="btn-luxury btn-gold" style="padding:0 16px; height:38px; font-size:0.75rem; letter-spacing:1px; white-space:nowrap; border-radius:2px;">APPLY</button>
+                  </div>
+                <?php endif; ?>
+                
+                <!-- View Offers Link -->
+                <div class="mt-2 text-left">
+                  <button type="button" class="btn-text-gold d-inline-flex align-items-center gap-1" onclick="openCouponsModal()" style="background:none; border:none; padding:0; cursor:pointer; color:var(--accent-gold); font-size:0.72rem; font-weight:700; letter-spacing:0.5px; text-transform:uppercase;">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-top:-1px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path></svg>
+                    View Available Offers
+                  </button>
+                </div>
+              </div>
+
               <div style="border-top:2px solid var(--border-color); padding-top:16px; margin-bottom:24px; display:flex; justify-content:space-between; font-size:1.25rem; font-weight:700;">
                 <span>Grand Total</span>
                 <span><?= formatPrice($grandTotal) ?></span>
@@ -423,6 +496,57 @@ function showAddressForm() {
 
 function toggleUpiSection(show) {
   document.getElementById('upiDetailsSection').style.display = show ? 'block' : 'none';
+}
+
+function applyCheckoutCoupon() {
+  const codeInput = document.getElementById('checkout_coupon_code');
+  if (!codeInput || !codeInput.value) return;
+  
+  const tempForm = document.createElement('form');
+  tempForm.method = 'POST';
+  tempForm.action = 'checkout.php';
+  
+  const csrfInput = document.createElement('input');
+  csrfInput.type = 'hidden';
+  csrfInput.name = 'csrf_token';
+  csrfInput.value = CSRF_TOKEN;
+  tempForm.appendChild(csrfInput);
+  
+  const actionInput = document.createElement('input');
+  actionInput.type = 'hidden';
+  actionInput.name = 'apply_coupon';
+  actionInput.value = '1';
+  tempForm.appendChild(actionInput);
+  
+  const codeField = document.createElement('input');
+  codeField.type = 'hidden';
+  codeField.name = 'coupon_code';
+  codeField.value = codeInput.value;
+  tempForm.appendChild(codeField);
+  
+  document.body.appendChild(tempForm);
+  tempForm.submit();
+}
+
+function removeCheckoutCoupon() {
+  const tempForm = document.createElement('form');
+  tempForm.method = 'POST';
+  tempForm.action = 'checkout.php';
+  
+  const csrfInput = document.createElement('input');
+  csrfInput.type = 'hidden';
+  csrfInput.name = 'csrf_token';
+  csrfInput.value = CSRF_TOKEN;
+  tempForm.appendChild(csrfInput);
+  
+  const actionInput = document.createElement('input');
+  actionInput.type = 'hidden';
+  actionInput.name = 'remove_coupon';
+  actionInput.value = '1';
+  tempForm.appendChild(actionInput);
+  
+  document.body.appendChild(tempForm);
+  tempForm.submit();
 }
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -661,4 +785,5 @@ document.addEventListener("DOMContentLoaded", function() {
   </script>
 <?php endif; ?>
 
+<?php require_once __DIR__ . '/includes/coupons-modal.php'; ?>
 <?php require_once __DIR__ . '/includes/footer.php'; ?>
