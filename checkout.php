@@ -459,7 +459,10 @@ document.addEventListener("DOMContentLoaded", function() {
             <input type="email" name="email" required class="newsletter-input" style="width:100%; border-radius:2px; padding:10px 12px;">
           </div>
           <div class="mb-4">
-            <label class="form-label-small">Password</label>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <label class="form-label-small" style="margin-bottom:0;">Password</label>
+              <a href="forgot-password.php" target="_blank" style="font-size:0.7rem; color:var(--accent-gold); font-weight:600; text-decoration:underline; letter-spacing:0.5px;">Forgot Password?</a>
+            </div>
             <input type="password" name="password" required class="newsletter-input" style="width:100%; border-radius:2px; padding:10px 12px;">
           </div>
           <div id="loginModalError" class="modal-error" style="display:none;"></div>
