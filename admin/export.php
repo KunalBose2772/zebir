@@ -46,7 +46,7 @@ foreach ($products as $p) {
         $p['sale_price'] !== null ? $p['sale_price'] : '',
         $p['stock'],
         $p['category_name'] ?: '',
-        $p['featured_image'] ?: '',
+        $p['featured_image'] ? productImageUrl($p['featured_image']) : '',
         $p['is_featured'] ? '1' : '0'
     ]);
 }

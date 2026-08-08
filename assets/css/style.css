@@ -1085,41 +1085,28 @@ input:focus, select:focus, textarea:focus {
 .footer-socials {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 16px;
   margin-top: 24px;
+  align-items: center;
 }
 
 .footer-social-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #f7f3eb;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   text-decoration: none;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), filter 0.3s ease;
 }
 
 .footer-social-btn svg {
-  width: 20px;
-  height: 20px;
-  fill: currentColor;
-  transition: transform 0.3s ease;
+  width: 32px;
+  height: 32px;
+  display: block;
 }
 
 .footer-social-btn:hover {
-  background: var(--accent-gold);
-  border-color: var(--accent-gold);
-  color: #0d0d0d;
-  transform: translateY(-4px) scale(1.05);
-  box-shadow: 0 8px 24px rgba(200, 150, 12, 0.35);
-}
-
-.footer-social-btn:hover svg {
-  transform: scale(1.15);
+  transform: translateY(-4px) scale(1.12);
+  filter: brightness(1.1) drop-shadow(0 4px 12px rgba(255, 255, 255, 0.12));
 }
 
 /* Footer contact list */
