@@ -2,7 +2,7 @@
 /vendor/
 
 # Sensitive config files
-config/database.php
+# config/database.php
 
 # Environment & secrets
 .env
