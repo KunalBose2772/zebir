@@ -10,8 +10,8 @@ Options -Indexes
 
     # 1. Redirect GET requests from /admin/filename.php to /admin/filename (External Redirect)
     RewriteCond %{REQUEST_METHOD} !POST
-    RewriteCond %{THE_REQUEST} \.php [NC]
-    RewriteRule ^([^/.]+)\.php$ $1 [R=301,L]
+    RewriteCond %{THE_REQUEST} \s/+(.*)\.php [NC]
+    RewriteRule ^(.*)\.php$ /%1 [R=301,L]
 
     # 2. Rewrite /admin/filename to /admin/filename.php (Internal Rewrite)
     RewriteCond %{REQUEST_FILENAME} !-d
