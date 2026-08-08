@@ -31,6 +31,7 @@ function getDB(): PDO {
             // Force UTF-8 at connection level — critical for live servers
             $pdo->exec("SET NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci'");
             $pdo->exec("SET CHARACTER SET utf8mb4");
+            $pdo->exec("SET time_zone = '+05:30'");
         } catch (PDOException $e) {
             error_log("DB Connection Error: " . $e->getMessage());
             die(json_encode(['error' => 'Database connection failed.']));
