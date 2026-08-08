@@ -70,7 +70,7 @@ $isIndex = (basename($_SERVER['PHP_SELF']) === 'index.php');
 
       <!-- Brand Logo -->
       <a href="<?= BASE_URL ?>" class="brand-logo" style="display:flex; align-items:center;">
-        <img src="<?= assetUrl('images/logoZ.png') ?>" alt="ZEBIR LIBAS Logo" style="height: 52px; width: auto; object-fit: contain;">
+        <img src="<?= assetUrl('images/logoZ.webp') ?>" alt="ZEBIR LIBAS Logo" style="height: 52px; width: auto; object-fit: contain;">
       </a>
 
       <!-- Desktop Navigation Menu -->

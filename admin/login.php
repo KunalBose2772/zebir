@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
   <div class="login-container">
     <div style="text-align:center; margin-bottom:32px;">
-      <img src="<?= assetUrl('images/logoZ.png') ?>" alt="Logo" style="max-width: 140px; filter: brightness(0); margin-bottom: 12px;">
+      <img src="<?= assetUrl('images/logoZ.webp') ?>" alt="Logo" style="max-width: 140px; filter: brightness(0); margin-bottom: 12px;">
       <div style="font-size:0.75rem; letter-spacing:0.1em; text-transform:uppercase; color: var(--text-muted); font-weight: 700;">Admin Console</div>
     </div>
 

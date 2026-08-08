@@ -44,7 +44,7 @@
       <!-- Brand -->
       <div class="footer-brand">
         <a href="<?= BASE_URL ?>" style="display:flex; align-items:center; margin-bottom:18px;">
-          <img src="<?= assetUrl('images/logoZ.png') ?>" alt="ZEBIR LIBAS" style="height:50px; width:auto; filter:brightness(1.15); object-fit:contain;">
+          <img src="<?= assetUrl('images/logoZ.webp') ?>" alt="ZEBIR LIBAS" style="height:50px; width:auto; filter:brightness(1.15); object-fit:contain;">
         </a>
         <p class="footer-about">
           Zebir is a contemporary women's wear brand specializing in elegant suit sets that blend tradition with modern style. Founded in 2024, Zebir empowers women through timeless designs, luxurious fabrics, and tailored comfort—offering sophistication, confidence, and affordability in every piece for today's bold and graceful woman.

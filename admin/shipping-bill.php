@@ -63,7 +63,7 @@ $siteAddress = getSetting('site_address', 'Dhipatoli Pundag Ranchi, Mirza Lane')
   <!-- Header -->
   <div class="header">
     <div style="background: #0f172a; padding: 10px 16px; border-radius: 4px; display: inline-block; line-height: 1;">
-      <img src="<?= BASE_URL ?>assets/images/logoZ.png" alt="ZEBIR LIBAS" style="height: 36px; width: auto; display: block; object-fit: contain;">
+      <img src="<?= BASE_URL ?>assets/images/logoZ.webp" alt="ZEBIR LIBAS" style="height: 36px; width: auto; display: block; object-fit: contain;">
     </div>
     <div class="title">SHIPPING BILL</div>
   </div>

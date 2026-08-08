@@ -63,7 +63,7 @@ $siteAddress = getSetting('site_address', 'Mumbai, India');
   <div class="header" style="align-items: center;">
     <div>
       <div class="logo">
-        <img src="<?= BASE_URL ?>assets/images/logoZ.png" alt="ZEBIR LIBAS" style="height: 36px; width: auto; display: block; object-fit: contain;">
+        <img src="<?= BASE_URL ?>assets/images/logoZ.webp" alt="ZEBIR LIBAS" style="height: 36px; width: auto; display: block; object-fit: contain;">
       </div>
       <div style="color: #666; font-size: 12px; margin-top: 10px;">
         <?= e($siteAddress) ?><br>
