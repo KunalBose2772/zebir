@@ -20,19 +20,12 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Upload directories (don't push user-uploaded content)
-uploads/products/*
-uploads/banners/*
-uploads/logo/*
-uploads/payments/*
-uploads/qr/*
-
-# Keep upload dirs but not their contents
-!uploads/products/.gitkeep
-!uploads/banners/.gitkeep
-!uploads/logo/.gitkeep
-!uploads/payments/.gitkeep
-!uploads/qr/.gitkeep
+# Keep upload dirs
+# uploads/products/*
+# uploads/banners/*
+# uploads/logo/*
+# uploads/payments/*
+# uploads/qr/*
 
 # Temp/utility scripts
 # convert_images.php
