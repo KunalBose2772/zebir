@@ -45,12 +45,14 @@ $otherCats = array_slice($allActiveCategories, $half);
 
 <?php
 $isIndex = (basename($_SERVER['PHP_SELF']) === 'index.php');
+$heroMode = getSetting('home_hero_mode', 'content');
+$isTransparentHeader = $isIndex && ($heroMode !== 'image');
 ?>
 
 <!-- Header / Navbar -->
-<header class="site-header <?= $isIndex ? 'header-transparent' : 'header-solid' ?>" id="siteHeader">
+<header class="site-header <?= $isTransparentHeader ? 'header-transparent' : 'header-solid' ?>" id="siteHeader">
   <!-- Announcement Bar -->
-  <div class="announcement-bar" id="announcementBar" <?= $isIndex ? 'style="display: none;"' : '' ?>>
+  <div class="announcement-bar" id="announcementBar" <?= $isTransparentHeader ? 'style="display: none;"' : '' ?>>
     <div class="announcement-marquee-wrapper">
       <div class="announcement-marquee-item">
         End Your Week in Style with Zebir's Great Deals! &nbsp;•&nbsp; Crafting the Finest Elegant Designs &nbsp;•&nbsp; Designed by You, Crafted by Zebir &nbsp;•&nbsp; Complimentary Shipping On Orders Over <?= formatPrice((float)getSetting('free_shipping_amount', '999')) ?> &nbsp;•&nbsp; Flat 10% Off On Your First Purchase | Use Code: ZEBIR10
@@ -264,7 +266,7 @@ $isIndex = (basename($_SERVER['PHP_SELF']) === 'index.php');
     }
 
     // 2. Transparent -> Sticky Header Scroll Transition (homepage only)
-    <?php if ($isIndex): ?>
+    <?php if ($isTransparentHeader): ?>
     const siteHeader = document.getElementById('siteHeader');
     const announcementBar = document.getElementById('announcementBar');
     

@@ -252,9 +252,16 @@ input:focus, select:focus, textarea:focus {
 /* Solid Header State */
 .site-header.header-solid {
   position: relative;
-  background: #000000;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  border-bottom: 1px solid rgba(200, 150, 12, 0.35);
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-sm);
+  border-bottom: 1px solid var(--border-color);
+}
+.site-header.header-solid .nav-link,
+.site-header.header-solid .icon-btn {
+  color: var(--text-main);
+}
+.site-header.header-solid .nav-link:hover {
+  color: var(--accent-gold);
 }
 
 /* Sticky Header State */
@@ -263,10 +270,17 @@ input:focus, select:focus, textarea:focus {
   top: 0;
   left: 0;
   right: 0;
-  background: #000000;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  border-bottom: 1px solid rgba(200, 150, 12, 0.35);
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-md);
+  border-bottom: 1px solid var(--border-color);
   animation: slideDownHeader 0.3s ease forwards;
+}
+.site-header.header-sticky .nav-link,
+.site-header.header-sticky .icon-btn {
+  color: var(--text-main);
+}
+.site-header.header-sticky .nav-link:hover {
+  color: var(--accent-gold);
 }
 
 @keyframes slideDownHeader {
