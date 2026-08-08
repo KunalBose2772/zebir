@@ -50,9 +50,20 @@ function sendMail(string $toEmail, string $toName, string $subject, string $html
     $fromName  = $from['name'];
 
     if (!class_exists('PHPMailer\PHPMailer\PHPMailer')) {
+        $error = 'PHPMailer library not available';
         $pdo = getDB();
         $pdo->prepare("INSERT INTO email_logs (to_email, subject, status, error) VALUES (?,?,'failed',?)")
-            ->execute([$toEmail, $subject, 'PHPMailer library not available']);
+            ->execute([$toEmail, $subject, $error]);
+        
+        if (session_status() === PHP_SESSION_NONE) {
+            @session_start();
+        }
+        $_SESSION['mailer_debug'][] = [
+            'to' => $toEmail,
+            'subject' => $subject,
+            'status' => 'failed',
+            'error' => $error
+        ];
         return false;
     }
 
@@ -73,6 +84,16 @@ function sendMail(string $toEmail, string $toName, string $subject, string $html
         $pdo->prepare("INSERT INTO email_logs (to_email, subject, status, error) VALUES (?,?,'failed',?)")
             ->execute([$toEmail, $subject, $error]);
         error_log("Mailer Error: {$error}");
+
+        if (session_status() === PHP_SESSION_NONE) {
+            @session_start();
+        }
+        $_SESSION['mailer_debug'][] = [
+            'to' => $toEmail,
+            'subject' => $subject,
+            'status' => 'failed',
+            'error' => $error
+        ];
         return false;
     }
 
@@ -110,6 +131,16 @@ function sendMail(string $toEmail, string $toName, string $subject, string $html
         $pdo = getDB();
         $pdo->prepare("INSERT INTO email_logs (to_email, subject, status) VALUES (?,?,'sent')")
             ->execute([$toEmail, $subject]);
+
+        if (session_status() === PHP_SESSION_NONE) {
+            @session_start();
+        }
+        $_SESSION['mailer_debug'][] = [
+            'to' => $toEmail,
+            'subject' => $subject,
+            'status' => 'sent',
+            'error' => null
+        ];
         return true;
     } catch (\Exception $e) {
         $error = $mail->ErrorInfo ?: $e->getMessage();
@@ -117,6 +148,16 @@ function sendMail(string $toEmail, string $toName, string $subject, string $html
         $pdo->prepare("INSERT INTO email_logs (to_email, subject, status, error) VALUES (?,?,'failed',?)")
             ->execute([$toEmail, $subject, $error]);
         error_log("Mailer Error: " . $error);
+
+        if (session_status() === PHP_SESSION_NONE) {
+            @session_start();
+        }
+        $_SESSION['mailer_debug'][] = [
+            'to' => $toEmail,
+            'subject' => $subject,
+            'status' => 'failed',
+            'error' => $error
+        ];
         return false;
     }
 }

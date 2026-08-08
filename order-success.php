@@ -42,6 +42,31 @@ require_once __DIR__ . '/includes/header.php';
       </div>
     </div>
     
+    <?php if (!empty($_SESSION['mailer_debug'])): ?>
+      <div style="background-color: #1b1b1b; border: 1px solid var(--border-color); padding: 24px; border-radius: 8px; text-align: left; margin-bottom: 32px; border-left: 4px solid var(--accent-gold);">
+        <h4 style="font-family: monospace; font-size: 1rem; margin-top: 0; margin-bottom: 12px; color: var(--accent-gold); display: flex; justify-content: space-between; align-items: center; letter-spacing: 1px; text-transform: uppercase;">
+          <span>🛠️ SMTP Mailer Debug Log</span>
+          <span style="font-size: 0.65rem; background: var(--accent-gold); color: #000; padding: 2px 8px; border-radius: 4px; font-weight: bold; letter-spacing: 0.5px;">Developer Debug</span>
+        </h4>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <?php foreach ($_SESSION['mailer_debug'] as $log): ?>
+            <div style="font-family: monospace; font-size: 0.8rem; padding: 12px; border-radius: 4px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); color: #eee;">
+              <strong>Recipient:</strong> <?= e($log['to']) ?><br>
+              <strong>Subject:</strong> <?= e($log['subject']) ?><br>
+              <strong>Status:</strong> 
+              <?php if ($log['status'] === 'sent'): ?>
+                <span style="color: #2e7d32; background: #e8f5e9; padding: 2px 6px; border-radius: 3px; font-weight: bold; font-size: 0.7rem;">SUCCESSFULLY SENT</span>
+              <?php else: ?>
+                <span style="color: #c62828; background: #ffebee; padding: 2px 6px; border-radius: 3px; font-weight: bold; font-size: 0.7rem;">DELIVERY FAILED</span><br>
+                <strong style="color: #ef5350;">Error Details:</strong> <span style="color: #ef5350; font-size: 0.78rem; word-break: break-all;"><?= e($log['error']) ?></span>
+              <?php endif; ?>
+            </div>
+          <?php endforeach; ?>
+        </div>
+      </div>
+      <?php unset($_SESSION['mailer_debug']); ?>
+    <?php endif; ?>
+    
     <?php if (isset($_SESSION['new_account_password'])): ?>
       <div style="background-color: var(--bg-secondary); border: 1px solid var(--border-color); padding: 24px; border-radius: 8px; text-align: left; margin-bottom: 32px; border-left: 4px solid var(--accent-gold);">
         <h4 style="font-family: Georgia, serif; font-size: 1.15rem; margin-top: 0; margin-bottom: 8px; color: var(--accent-gold);">Account Created Automatically!</h4>
