@@ -33,7 +33,7 @@ $menuCol4 = array_slice($allActiveCategories, $colSize * 3);
   <link rel="icon" type="image/webp" href="<?= assetUrl('images/favicon.webp') ?>">
 
   <!-- Fonts & Core CSS -->
-  <link rel="stylesheet" href="<?= assetUrl('css/style.css') ?>">
+  <link rel="stylesheet" href="<?= assetUrl('css/style.css') ?>?v=<?= filemtime(__DIR__ . '/../assets/css/style.css') ?>">
   
   <!-- Swiper.js for Luxury Sliders -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
