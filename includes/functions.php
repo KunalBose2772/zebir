@@ -195,6 +195,51 @@ function isInWishlist(int $productId): bool {
     return (bool) $stmt->fetch();
 }
 
+// ── Customer Address Helpers ────────────────────────────────────
+function getCustomerDefaultAddress(int $customerId): array|null {
+    $pdo = getDB();
+    $stmt = $pdo->prepare("SELECT * FROM customer_addresses WHERE customer_id = ? ORDER BY is_default DESC, id DESC LIMIT 1");
+    $stmt->execute([$customerId]);
+    return $stmt->fetch() ?: null;
+}
+
+function saveCustomerAddress(int $customerId, array $data): void {
+    $pdo = getDB();
+    $stmt = $pdo->prepare("SELECT id FROM customer_addresses WHERE customer_id = ? LIMIT 1");
+    $stmt->execute([$customerId]);
+    $existing = $stmt->fetch();
+    
+    if ($existing) {
+        $stmt = $pdo->prepare("UPDATE customer_addresses SET 
+            name = ?, phone = ?, address_line1 = ?, address_line2 = ?, city = ?, state = ?, pincode = ?, is_default = 1
+            WHERE id = ?");
+        $stmt->execute([
+            $data['name'],
+            $data['phone'],
+            $data['address_line1'],
+            $data['address_line2'],
+            $data['city'],
+            $data['state'],
+            $data['pincode'],
+            $existing['id']
+        ]);
+    } else {
+        $stmt = $pdo->prepare("INSERT INTO customer_addresses 
+            (customer_id, name, phone, address_line1, address_line2, city, state, pincode, is_default)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)");
+        $stmt->execute([
+            $customerId,
+            $data['name'],
+            $data['phone'],
+            $data['address_line1'],
+            $data['address_line2'],
+            $data['city'],
+            $data['state'],
+            $data['pincode']
+        ]);
+    }
+}
+
 // ── Image Helpers ──────────────────────────────────────────────
 function productImageUrl(string $img): string {
     if (!$img) {

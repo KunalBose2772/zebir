@@ -11,6 +11,10 @@ if (empty($cart)) {
 
 $pageTitle = "Checkout – ZEBIR LIBAS";
 $customer = currentCustomer();
+$savedAddress = null;
+if ($customer) {
+    $savedAddress = getCustomerDefaultAddress($customer['id']);
+}
 $appliedCoupon = $_SESSION['applied_coupon'] ?? null;
 $subtotal = cartTotal();
 $discount = $appliedCoupon['discount'] ?? 0;
@@ -122,6 +126,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ]);
 
             $orderId = $pdo->lastInsertId();
+
+            if ($customerId) {
+                saveCustomerAddress($customerId, [
+                    'name' => $shippingName,
+                    'phone' => $shippingPhone,
+                    'address_line1' => $address1,
+                    'address_line2' => $address2,
+                    'city' => $city,
+                    'state' => $state,
+                    'pincode' => $pincode
+                ]);
+            }
 
             // Insert Order Items
             $itemStmt = $pdo->prepare("INSERT INTO order_items (order_id, product_id, product_name, product_image, size, color, quantity, price, total) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
@@ -248,44 +264,63 @@ require_once __DIR__ . '/includes/header.php';
         <div>
           <h3 class="font-serif mb-4" style="font-size: 1.5rem;">Shipping Address</h3>
           
-          <div class="form-grid-2 mb-3">
-            <div>
-              <label class="d-block font-weight-bold mb-1" style="font-size:0.8rem; text-transform:uppercase;">Full Name *</label>
-              <input type="text" name="shipping_name" class="newsletter-input" style="width:100%; border-radius:2px;" value="<?= e($_POST['shipping_name'] ?? $customer['name'] ?? '') ?>" required>
+          <?php if ($savedAddress): ?>
+            <!-- Saved Shipping Address Card -->
+            <div id="savedAddressCard" class="content-card mb-4" style="border: 1px solid var(--accent-gold); padding: 24px; border-radius: 8px; position: relative;">
+                <h4 class="font-serif mb-2" style="font-size: 1.1rem; color: var(--accent-gold);">Deliver to Saved Address</h4>
+                <div style="font-size: 0.95rem; line-height: 1.6;">
+                    <strong><?= e($savedAddress['name']) ?></strong><br>
+                    <?= e($savedAddress['address_line1']) ?><br>
+                    <?php if ($savedAddress['address_line2']): ?><?= e($savedAddress['address_line2']) ?><br><?php endif; ?>
+                    <?= e($savedAddress['city']) ?>, <?= e($savedAddress['state']) ?> - <?= e($savedAddress['pincode']) ?><br>
+                    Phone: <?= e($savedAddress['phone']) ?>
+                </div>
+                <button type="button" class="btn-link-guest mt-3" onclick="showAddressForm()" style="text-decoration: none; font-size: 0.8rem; letter-spacing: 1px; font-weight: 700; text-transform: uppercase;">
+                    Edit or Use Another Address &rarr;
+                </button>
             </div>
-            <div>
-              <label class="d-block font-weight-bold mb-1" style="font-size:0.8rem; text-transform:uppercase;">Phone Number *</label>
-              <input type="tel" name="shipping_phone" class="newsletter-input" style="width:100%; border-radius:2px;" value="<?= e($_POST['shipping_phone'] ?? $customer['phone'] ?? '') ?>" required>
+          <?php endif; ?>
+
+          <div id="addressInputsContainer" <?php if ($savedAddress): ?>style="display:none;"<?php endif; ?>>
+            <div class="form-grid-2 mb-3">
+              <div>
+                <label class="d-block font-weight-bold mb-1" style="font-size:0.8rem; text-transform:uppercase;">Full Name *</label>
+                <input type="text" name="shipping_name" class="newsletter-input" style="width:100%; border-radius:2px;" value="<?= e($_POST['shipping_name'] ?? $savedAddress['name'] ?? $customer['name'] ?? '') ?>" required>
+              </div>
+              <div>
+                <label class="d-block font-weight-bold mb-1" style="font-size:0.8rem; text-transform:uppercase;">Phone Number *</label>
+                <input type="tel" name="shipping_phone" class="newsletter-input" style="width:100%; border-radius:2px;" value="<?= e($_POST['shipping_phone'] ?? $savedAddress['phone'] ?? $customer['phone'] ?? '') ?>" required>
+              </div>
             </div>
-          </div>
 
-          <div class="mb-3">
-            <label class="d-block font-weight-bold mb-1" style="font-size:0.8rem; text-transform:uppercase;">Email Address *</label>
-            <input type="email" name="shipping_email" class="newsletter-input" style="width:100%; border-radius:2px;" value="<?= e($_POST['shipping_email'] ?? $customer['email'] ?? '') ?>" required>
-          </div>
-
-          <div class="mb-3">
-            <label class="d-block font-weight-bold mb-1" style="font-size:0.8rem; text-transform:uppercase;">Address Line 1 *</label>
-            <input type="text" name="address_line1" class="newsletter-input" placeholder="House/Flat No., Building Name, Street" style="width:100%; border-radius:2px;" value="<?= e($_POST['address_line1'] ?? '') ?>" required>
-          </div>
-
-          <div class="mb-3">
-            <label class="d-block font-weight-bold mb-1" style="font-size:0.8rem; text-transform:uppercase;">Address Line 2 (Optional)</label>
-            <input type="text" name="address_line2" class="newsletter-input" placeholder="Landmark, Area" style="width:100%; border-radius:2px;" value="<?= e($_POST['address_line2'] ?? '') ?>">
-          </div>
-
-          <div class="form-grid-3 mb-4">
-            <div>
-              <label class="d-block font-weight-bold mb-1" style="font-size:0.8rem; text-transform:uppercase;">City *</label>
-              <input type="text" name="city" class="newsletter-input" style="width:100%; border-radius:2px;" value="<?= e($_POST['city'] ?? '') ?>" required>
+            <div class="mb-3">
+              <label class="d-block font-weight-bold mb-1" style="font-size:0.8rem; text-transform:uppercase;">Email Address *</label>
+              <input type="email" name="shipping_email" class="newsletter-input" style="width:100%; border-radius:2px;" value="<?= e($_POST['shipping_email'] ?? $savedAddress['email'] ?? $customer['email'] ?? '') ?>" required>
             </div>
-            <div>
-              <label class="d-block font-weight-bold mb-1" style="font-size:0.8rem; text-transform:uppercase;">State *</label>
-              <input type="text" name="state" class="newsletter-input" style="width:100%; border-radius:2px;" value="<?= e($_POST['state'] ?? '') ?>" required>
+
+            <div class="mb-3">
+              <label class="d-block font-weight-bold mb-1" style="font-size:0.8rem; text-transform:uppercase;">Address Line 1 *</label>
+              <input type="text" name="address_line1" class="newsletter-input" placeholder="House/Flat No., Building Name, Street" style="width:100%; border-radius:2px;" value="<?= e($_POST['address_line1'] ?? $savedAddress['address_line1'] ?? '') ?>" required>
             </div>
-            <div>
-              <label class="d-block font-weight-bold mb-1" style="font-size:0.8rem; text-transform:uppercase;">Pincode *</label>
-              <input type="text" name="pincode" class="newsletter-input" style="width:100%; border-radius:2px;" value="<?= e($_POST['pincode'] ?? '') ?>" required>
+
+            <div class="mb-3">
+              <label class="d-block font-weight-bold mb-1" style="font-size:0.8rem; text-transform:uppercase;">Address Line 2 (Optional)</label>
+              <input type="text" name="address_line2" class="newsletter-input" placeholder="Landmark, Area" style="width:100%; border-radius:2px;" value="<?= e($_POST['address_line2'] ?? $savedAddress['address_line2'] ?? '') ?>">
+            </div>
+
+            <div class="form-grid-3 mb-4">
+              <div>
+                <label class="d-block font-weight-bold mb-1" style="font-size:0.8rem; text-transform:uppercase;">City *</label>
+                <input type="text" name="city" class="newsletter-input" style="width:100%; border-radius:2px;" value="<?= e($_POST['city'] ?? $savedAddress['city'] ?? '') ?>" required>
+              </div>
+              <div>
+                <label class="d-block font-weight-bold mb-1" style="font-size:0.8rem; text-transform:uppercase;">State *</label>
+                <input type="text" name="state" class="newsletter-input" style="width:100%; border-radius:2px;" value="<?= e($_POST['state'] ?? $savedAddress['state'] ?? '') ?>" required>
+              </div>
+              <div>
+                <label class="d-block font-weight-bold mb-1" style="font-size:0.8rem; text-transform:uppercase;">Pincode *</label>
+                <input type="text" name="pincode" class="newsletter-input" style="width:100%; border-radius:2px;" value="<?= e($_POST['pincode'] ?? $savedAddress['pincode'] ?? '') ?>" required>
+              </div>
             </div>
           </div>
 
@@ -377,6 +412,15 @@ require_once __DIR__ . '/includes/header.php';
 </section>
 
 <script>
+function showAddressForm() {
+  const card = document.getElementById('savedAddressCard');
+  const container = document.getElementById('addressInputsContainer');
+  if (card && container) {
+    card.style.display = 'none';
+    container.style.display = 'block';
+  }
+}
+
 function toggleUpiSection(show) {
   document.getElementById('upiDetailsSection').style.display = show ? 'block' : 'none';
 }
